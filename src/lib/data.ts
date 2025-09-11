@@ -153,7 +153,7 @@ export const generalInfo: GeneralInfo = {
     'Pay the application fee online.',
     'Download and print the confirmation page.',
   ],
-  fees: 'The average tuition fee is approximately ₹1,50,000 per semester for undergraduate programs. This does not include hostel, mess, or other personal expenses. Specific fees may vary by program. A detailed fee structure is available on the university website.',
+  fees: 'The average tuition fee is approximately ₹1,50,000 per semester for undergraduate programs. This does not include hostel, mess, or other personal expenses. Specific fees may vary by program. A detailed fee structure is available on the university website. Hostel fees are ₹60,000 per year, and bus fees are ₹20,000 per year.',
   eligibility: 'Applicants must have passed the Class 12 (or equivalent) examination. For engineering, PCM is required, and for medical, PCB is required. Minimum percentage criteria and entrance exam scores (like JEE/NEET) are applicable.',
   facilities: 'Our campus boasts state-of-the-art facilities, including modern laboratories, a 24/7 library, a sports complex with cricket and football grounds, multiple canteens, and student common rooms. High-speed Wi-Fi is available across the entire campus.',
 };
