@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useActionState, useEffect, useRef, useState } from 'react';
+import React, { useActionState, useEffect, useRef, useState, useTransition } from 'react';
 import { useFormStatus } from 'react-dom';
 import { ArrowUp, LoaderCircle } from 'lucide-react';
 
@@ -13,6 +13,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Textarea } from './ui/textarea';
+import { courses } from '@/lib/data';
+import { ActionableMessage } from './actionable-message';
 
 function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: string }) {
   const { pending } = useFormStatus();
@@ -82,6 +84,7 @@ export function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [showChat, setShowChat] = useState(false);
   const [aiState, formAction] = useActionState(askAI, initialAIState);
+  const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -100,12 +103,36 @@ export function ChatInterface() {
     setShowChat(true);
   };
 
+  const handleAction = (query: string) => {
+    setMessages((prev) => [...prev, { role: 'user', content: query }]);
+    const formData = new FormData();
+    formData.append('query', query);
+    startTransition(() => {
+      formAction(formData);
+    });
+  };
+
   useEffect(() => {
     if (aiState.answer) {
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: aiState.answer as string },
-      ]);
+      if (aiState.answer === 'ACTION_SELECT_COURSE_FOR_FEES') {
+         setMessages((prev) => [
+          ...prev,
+          { 
+            role: 'assistant', 
+            content: 'Of course! Please select a course to see the fee structure.',
+            component: 'CourseSelector',
+            componentProps: {
+              courses: courses.map(c => c.title),
+              action: (course: string) => handleAction(`What are the fees for ${course}?`),
+            }
+          },
+        ]);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: aiState.answer as string },
+        ]);
+      }
     }
     if (aiState.error) {
       toast({
@@ -118,7 +145,6 @@ export function ChatInterface() {
 
   useEffect(() => {
     if (scrollAreaRef.current) {
-        // A slight delay to allow the new message to render
         setTimeout(() => {
             const viewport = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]');
             if (viewport) {
@@ -136,9 +162,22 @@ export function ChatInterface() {
     <div className="flex h-[calc(100vh-8rem)] flex-col">
       <ScrollArea className="flex-1" ref={scrollAreaRef}>
         <div className="space-y-6 px-4 py-2">
-          {messages.map((message, index) => (
-            <ChatMessage key={index} message={message} />
-          ))}
+          {messages.map((message, index) => {
+             if (message.component === 'CourseSelector' && message.componentProps) {
+              return (
+                <ActionableMessage key={index} message={message} {...message.componentProps} />
+              )
+            }
+            return <ChatMessage key={index} message={message} />;
+          })}
+           {isPending && (
+            <div className="flex justify-start">
+              <div className="flex items-center gap-2 rounded-lg bg-muted px-4 py-3">
+                <LoaderCircle className="h-5 w-5 animate-spin text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Thinking...</span>
+              </div>
+            </div>
+          )}
         </div>
       </ScrollArea>
       <div className="border-t p-4">
@@ -146,9 +185,11 @@ export function ChatInterface() {
           ref={formRef}
           action={(formData) => {
             const query = formData.get('query') as string;
-            if (query.trim()) {
+            if (query.trim() && !isPending) {
               setMessages((prev) => [...prev, { role: 'user', content: query }]);
-              formAction(formData);
+              startTransition(() => {
+                formAction(formData);
+              });
               formRef.current?.reset();
             }
           }}
@@ -160,8 +201,9 @@ export function ChatInterface() {
             autoComplete="off"
             className="flex-1"
             required
+            disabled={isPending}
           />
-          <Button type="submit" size="icon">
+          <Button type="submit" size="icon" disabled={isPending}>
             <ArrowUp />
             <span className="sr-only">Send message</span>
           </Button>

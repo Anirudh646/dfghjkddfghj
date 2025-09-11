@@ -27,6 +27,14 @@ const AnswerAdmissionQueryOutputSchema = z.object({
 export type AnswerAdmissionQueryOutput = z.infer<typeof AnswerAdmissionQueryOutputSchema>;
 
 export async function answerAdmissionQuery(input: AnswerAdmissionQueryInput): Promise<AnswerAdmissionQueryOutput> {
+  // A simple heuristic to detect if the user is asking about fees without specifying a course.
+  const isFeeQuery = input.query.toLowerCase().includes('fee') || input.query.toLowerCase().includes('cost');
+  const hasCourseContext = /computer science|business administration|jee|neet|mechanical|civil|commerce|history/i.test(input.query);
+
+  if (isFeeQuery && !hasCourseContext) {
+    return { answer: 'ACTION_SELECT_COURSE_FOR_FEES' };
+  }
+  
   return answerAdmissionQueryFlow(input);
 }
 
@@ -49,16 +57,14 @@ const prompt = ai.definePrompt({
 
   **Instructions:**
   1.  Provide a short, direct answer in a single, easy-to-understand paragraph.
-  2.  If the query is about fees but does not specify a course, ask the user to specify which course they are interested in.
-  3.  If the query is about fees for a specific course, use the fee structure information provided within the 'Course Details' for that course.
-  4.  When providing the fee structure for a course, format it as follows, with each semester on a new line:
+  2.  When providing the fee structure for a course, format it as follows, with each semester on a new line:
       **[Course Name]**
       - **[Semester/Term]:** [Fee Amount]
       - **[Semester/Term]:** [Fee Amount]
       ...
-  5.  For general fee inquiries (like hostel or bus fees), use the 'General Fees' information.
-  6. If the user asks a general question, answer in a helpful and clear paragraph.
-  7.  If the requested information is not available, state that and suggest they contact the admissions office.
+  3.  For general fee inquiries (like hostel or bus fees), use the 'General Fees' information.
+  4. If the user asks a general question, answer in a helpful and clear paragraph.
+  5.  If the requested information is not available, state that and suggest they contact the admissions office.
   `,
 });
 
