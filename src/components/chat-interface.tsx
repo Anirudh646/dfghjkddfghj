@@ -57,22 +57,22 @@ function GetStarted({ onGuideReceived }: { onGuideReceived: (guide: string) => v
       <Card className="w-full max-w-lg">
         <form action={formAction}>
           <CardHeader>
-            <CardTitle>Welcome to CampusConnect AI</CardTitle>
+            <CardTitle>Welcome to the AI Admission Counselor</CardTitle>
             <CardDescription>
-              To get started, tell us what you're interested in studying. We'll create a personalized guide to help you on your journey.
+              Tell us what you're interested in studying, and we'll create a personalized guide to help you get started on your academic journey.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Textarea
               name="studyInterest"
-              placeholder="e.g., 'Computer Science', 'Business', 'JEE Preparation'..."
+              placeholder="For example: 'Mechanical Engineering', 'BBA', or 'JEE Preparation'"
               rows={3}
               required
             />
              {state.error && <p className="mt-2 text-sm text-destructive">{state.error}</p>}
           </CardContent>
           <CardFooter>
-            <SubmitButton label="Get My Guide" pendingLabel="Generating..." />
+            <SubmitButton label="Get My Personalised Guide" pendingLabel="Generating..." />
           </CardFooter>
         </form>
       </Card>

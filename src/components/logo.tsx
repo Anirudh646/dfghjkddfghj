@@ -10,14 +10,13 @@ export function Logo({ className, hideText = false }: { className?: string; hide
           fill="currentColor"
           className="h-6 w-6"
         >
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
-          <path d="M12 11.5c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm0-4c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z" />
-          <path d="M12 13c-2.33 0-7 1.17-7 3.5V18c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-1.5c0-2.33-4.67-3.5-7-3.5zm5 5H7v-.5c.22-1.25 3.03-2.5 5-2.5s4.78 1.25 5 2.5V18z" />
+          <path d="M12 2L3 5v6.2C3 17.3 7 21.4 12 22.9c5-1.5 9-5.6 9-11.7V5L12 2zm0 18.5c-4.2 0-7-3.1-7-8.2V6.3l7-2.1 7 2.1v6.3c0 5.1-2.8 8.2-7 8.2z"/>
+          <path d="M12 7l-4 1.5v3.5c0 2.8 1.9 5.2 4.1 5.9.3.1.6.1.9 0 2.2-.7 4.1-3.1 4.1-5.9V8.5L12 7z" />
         </svg>
       </div>
       {!hideText && (
         <span className="text-xl font-bold tracking-tight text-foreground">
-          CampusConnect AI
+          University AI
         </span>
       )}
     </div>
