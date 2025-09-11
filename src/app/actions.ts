@@ -1,6 +1,7 @@
 'use server';
 
 import { answerAdmissionQuery } from '@/ai/flows/answer-admission-queries';
+import { getStartedGuideFromPrompt } from '@/ai/flows/get-started-guide-from-prompt';
 import { courses, contacts, generalInfo, faqs } from '@/lib/data';
 import { z } from 'zod';
 
@@ -47,5 +48,33 @@ export async function askAI(prevState: any, formData: FormData): Promise<{ answe
   } catch (e) {
     console.error(e);
     return { error: 'An error occurred while processing your request. Please try again.' };
+  }
+}
+
+const GetStartedSchema = z.string().min(3, { message: 'Please enter your study interest.' }).max(100, { message: 'Your input is too long.' });
+
+export async function getStarted(prevState: any, formData: FormData): Promise<{ guide?: string; error?: string }> {
+  const studyInterest = formData.get('studyInterest');
+  const validation = GetStartedSchema.safeParse(studyInterest);
+
+  if (!validation.success) {
+    return { error: validation.error.errors[0].message };
+  }
+
+  const validInterest = validation.data;
+
+  try {
+    const context = getContextString();
+    const result = await getStartedGuideFromPrompt({
+      studyInterest: validInterest,
+      universityCourses: context.courseDetails,
+      admissionRequirements: context.eligibilityCriteria,
+      financialAidOptions: 'Information about financial aid is available on the university website and can be discussed with our financial aid advisors.',
+      studentLifeInfo: context.facilities,
+    });
+    return { guide: result.guide };
+  } catch (e) {
+    console.error(e);
+    return { error: 'An error occurred while generating your guide. Please try again.' };
   }
 }

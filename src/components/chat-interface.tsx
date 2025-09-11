@@ -4,44 +4,42 @@ import React, { useActionState, useEffect, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { ArrowUp, LoaderCircle } from 'lucide-react';
 
-import { askAI } from '@/app/actions';
+import { askAI, getStarted } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ChatMessage, type Message } from '@/components/chat-message';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
+import { Textarea } from './ui/textarea';
 
-function SubmitButton() {
+function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: string }) {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" size="icon" disabled={pending}>
-      {pending ? <LoaderCircle className="animate-spin" /> : <ArrowUp />}
-      <span className="sr-only">Send message</span>
+    <Button type="submit" disabled={pending}>
+      {pending ? (
+        <>
+          <LoaderCircle className="mr-2 animate-spin" />
+          {pendingLabel}
+        </>
+      ) : (
+        label
+      )}
     </Button>
   );
 }
 
-const initialState: { answer?: string; error?: string } = {};
+const initialAIState: { answer?: string; error?: string } = {};
+const initialGuideState: { guide?: string; error?: string } = {};
 
-export function ChatInterface() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: 'assistant',
-      content: "Hello! I'm your AI admission counselor. How can I help you today? You can ask me about courses, fees, eligibility, and more.",
-    },
-  ]);
-  const [state, formAction] = useActionState(askAI, initialState);
-  const formRef = useRef<HTMLFormElement>(null);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
+function GetStarted({ onGuideReceived }: { onGuideReceived: (guide: string) => void }) {
+  const [state, formAction] = useActionState(getStarted, initialGuideState);
   const { toast } = useToast();
 
   useEffect(() => {
-    if (state.answer) {
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: state.answer as string },
-      ]);
+    if (state.guide) {
+      onGuideReceived(state.guide);
     }
     if (state.error) {
       toast({
@@ -50,7 +48,73 @@ export function ChatInterface() {
         description: state.error,
       });
     }
-  }, [state, toast]);
+  }, [state, onGuideReceived, toast]);
+
+  return (
+    <div className="flex h-full items-center justify-center p-4">
+      <Card className="w-full max-w-lg">
+        <form action={formAction}>
+          <CardHeader>
+            <CardTitle>Welcome to CampusConnect AI</CardTitle>
+            <CardDescription>
+              To get started, tell us what you're interested in studying. We'll create a personalized guide to help you on your journey.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Textarea
+              name="studyInterest"
+              placeholder="e.g., 'Computer Science', 'Business', 'JEE Preparation'..."
+              rows={3}
+              required
+            />
+             {state.error && <p className="mt-2 text-sm text-destructive">{state.error}</p>}
+          </CardContent>
+          <CardFooter>
+            <SubmitButton label="Get My Guide" pendingLabel="Generating..." />
+          </CardFooter>
+        </form>
+      </Card>
+    </div>
+  );
+}
+
+export function ChatInterface() {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [showChat, setShowChat] = useState(false);
+  const [aiState, formAction] = useActionState(askAI, initialAIState);
+  const formRef = useRef<HTMLFormElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
+
+  const handleGuideReceived = (guide: string) => {
+    setMessages([
+      {
+        role: 'assistant',
+        content: "Hello! I'm your AI admission counselor. How can I help you today?",
+      },
+      {
+        role: 'assistant',
+        content: `Here is a personalized guide to get you started:\n\n${guide}`,
+      }
+    ]);
+    setShowChat(true);
+  };
+
+  useEffect(() => {
+    if (aiState.answer) {
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: aiState.answer as string },
+      ]);
+    }
+    if (aiState.error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: aiState.error,
+      });
+    }
+  }, [aiState, toast]);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -63,6 +127,10 @@ export function ChatInterface() {
         }, 100);
     }
   }, [messages]);
+
+  if (!showChat) {
+    return <GetStarted onGuideReceived={handleGuideReceived} />;
+  }
 
   return (
     <div className="flex h-[calc(100vh-8rem)] flex-col">
@@ -93,7 +161,10 @@ export function ChatInterface() {
             className="flex-1"
             required
           />
-          <SubmitButton />
+          <Button type="submit" size="icon">
+            <ArrowUp />
+            <span className="sr-only">Send message</span>
+          </Button>
         </form>
       </div>
     </div>
