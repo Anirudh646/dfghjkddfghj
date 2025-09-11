@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import React, { useActionState, useEffect, useRef, useState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { ArrowUp, LoaderCircle } from 'lucide-react';
 
 import { askAI } from '@/app/actions';
@@ -31,7 +31,7 @@ export function ChatInterface() {
       content: "Hello! I'm your AI admission counselor. How can I help you today? You can ask me about courses, fees, eligibility, and more.",
     },
   ]);
-  const [state, formAction] = useFormState(askAI, initialState);
+  const [state, formAction] = useActionState(askAI, initialState);
   const formRef = useRef<HTMLFormElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
