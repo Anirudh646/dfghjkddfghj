@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -25,7 +26,7 @@ export function ActionableMessage({ message, courses, action }: ActionableMessag
         <article className="prose prose-sm dark:prose-invert text-inherit">
           <Markdown>{message.content}</Markdown>
         </article>
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-4 flex flex-col items-start gap-2">
           {courses.map((course) => (
             <Button
               key={course}
