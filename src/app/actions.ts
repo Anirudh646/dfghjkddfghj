@@ -5,7 +5,11 @@ import { courses, contacts, generalInfo, faqs } from '@/lib/data';
 import { z } from 'zod';
 
 const getContextString = () => {
-  const courseDetails = `Available courses: ${courses.map(c => c.title).join(', ')}. Details include descriptions, credits, etc.`;
+  const courseDetails = `Available courses: ${courses.map(c => {
+    const feeInfo = c.feeStructure ? ` Fee Structure: ${JSON.stringify(c.feeStructure)}` : '';
+    return `${c.title} (${c.department}) - ${c.description}.${feeInfo}`;
+  }).join('; ')}`;
+  
   const feesInformation = generalInfo.fees;
   const eligibilityCriteria = generalInfo.eligibility;
   const facilitiesInformation = generalInfo.facilities;

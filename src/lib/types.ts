@@ -5,6 +5,9 @@ export type Course = {
   code: string;
   description: string;
   credits: number;
+  feeStructure?: {
+    [semester: string]: number;
+  };
 };
 
 export type Contact = {

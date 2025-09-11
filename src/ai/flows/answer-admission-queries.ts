@@ -13,8 +13,8 @@ import {z} from 'genkit';
 
 const AnswerAdmissionQueryInputSchema = z.object({
   query: z.string().describe('The admission-related query from the student.'),
-  courseDetails: z.string().optional().describe('Course details information.'),
-  feesInformation: z.string().optional().describe('Fees related information.'),
+  courseDetails: z.string().optional().describe('Course details information, including course-specific fee structures.'),
+  feesInformation: z.string().optional().describe('General fees related information, like hostel and bus fees.'),
   eligibilityCriteria: z.string().optional().describe('Eligibility criteria information.'),
   facilitiesInformation: z.string().optional().describe('Facilities information.'),
   contactInformation: z.string().optional().describe('Contact information for help.'),
@@ -34,17 +34,26 @@ const prompt = ai.definePrompt({
   name: 'answerAdmissionQueryPrompt',
   input: {schema: AnswerAdmissionQueryInputSchema},
   output: {schema: AnswerAdmissionQueryOutputSchema},
-  prompt: `You are an AI admission counselor providing information to prospective students.
+  prompt: `You are an AI admission counselor for an Indian university. Your goal is to provide helpful and accurate information to prospective students.
 
-  Use the following information to answer the student's query. Be concise and helpful. Use bullet points to format your response.
+  Use the following information to answer the student's query. Be concise and helpful. Format your response using bullet points.
 
-  Course Details: {{{courseDetails}}}
-  Fees Information: {{{feesInformation}}}
-  Eligibility Criteria: {{{eligibilityCriteria}}}
-  Facilities Information: {{{facilitiesInformation}}}
-  Contact Information: {{{contactInformation}}}
+  **Contextual Information:**
+  - **Course Details:** {{{courseDetails}}}
+  - **General Fees (Hostel/Bus):** {{{feesInformation}}}
+  - **Eligibility Criteria:** {{{eligibilityCriteria}}}
+  - **Facilities:** {{{facilitiesInformation}}}
+  - **Contact Information:** {{{contactInformation}}}
 
-  Student Query: {{{query}}}`,
+  **Student Query:** {{{query}}}
+
+  **Instructions:**
+  1.  Carefully analyze the student's query to understand their needs.
+  2.  If the query is about fees for a specific course, use the fee structure information provided within the 'Course Details' for that course.
+  3.  For general fee inquiries (like hostel or bus fees), use the 'General Fees' information.
+  4.  Provide a clear, well-structured answer in bullet points.
+  5.  If the requested information is not available, state that and suggest they contact the admissions office.
+  `,
 });
 
 const answerAdmissionQueryFlow = ai.defineFlow(
