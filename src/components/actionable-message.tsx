@@ -26,7 +26,7 @@ export function ActionableMessage({ message, courses, action }: ActionableMessag
         <article className="prose prose-sm dark:prose-invert text-inherit">
           <Markdown>{message.content}</Markdown>
         </article>
-        <div className="mt-4 flex flex-col items-start gap-2">
+        <div className="mt-4 flex flex-wrap items-start gap-2">
           {courses.map((course) => (
             <Button
               key={course}
