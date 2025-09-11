@@ -1,1 +1,6 @@
-// Flows will be imported for their side effects in this file.
+import { config } from 'dotenv';
+config();
+
+import '@/ai/flows/answer-admission-queries.ts';
+import '@/ai/flows/summarize-course-information.ts';
+import '@/ai/flows/get-started-guide-from-prompt.ts';
