@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Course } from '@/lib/types';
-import { BookCheck, Briefcase, Milestone } from 'lucide-react';
+import { BookCheck, Briefcase, Milestone, Clock, CheckCircle } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
 
 export async function CourseCard({ course }: { course: Course }) {
@@ -77,6 +77,26 @@ export async function CourseCard({ course }: { course: Course }) {
             </p>
           </div>
         )}
+        <div className="space-y-4">
+            <div>
+              <h3 className="mb-2 flex items-center gap-2 font-semibold">
+                <Clock className="h-5 w-5 text-primary" />
+                Duration
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {course.duration}
+              </p>
+            </div>
+             <div>
+              <h3 className="mb-2 flex items-center gap-2 font-semibold">
+                <CheckCircle className="h-5 w-5 text-primary" />
+                Eligibility
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {course.eligibility}
+              </p>
+            </div>
+        </div>
       </CardContent>
     </Card>
   );

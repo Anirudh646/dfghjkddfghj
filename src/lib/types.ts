@@ -3,10 +3,12 @@ export type Course = {
   title: string;
   department: string;
   code: string;
-  description: string;
+  description:string;
+  eligibility: string;
+  duration: string;
   credits: number;
   feeStructure?: {
-    [semester: string]: number;
+    [key: string]: number;
   };
 };
 

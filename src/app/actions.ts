@@ -8,7 +8,7 @@ import { z } from 'zod';
 const getContextString = () => {
   const courseDetails = `Available courses: ${courses.map(c => {
     const feeInfo = c.feeStructure ? ` Fee Structure: ${JSON.stringify(c.feeStructure)}` : '';
-    return `${c.title} (${c.department}) - ${c.description}.${feeInfo}`;
+    return `${c.title} (${c.department}) - ${c.description}. Duration: ${c.duration}. Eligibility: ${c.eligibility}.${feeInfo}`;
   }).join('; ')}`;
   
   const feesInformation = generalInfo.fees;
