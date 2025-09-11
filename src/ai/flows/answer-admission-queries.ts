@@ -27,10 +27,14 @@ const AnswerAdmissionQueryOutputSchema = z.object({
 export type AnswerAdmissionQueryOutput = z.infer<typeof AnswerAdmissionQueryOutputSchema>;
 
 export async function answerAdmissionQuery(input: AnswerAdmissionQueryInput): Promise<AnswerAdmissionQueryOutput> {
-  const query = input.query.toLowerCase();
+  const query = input.query.toLowerCase().trim();
   const isFeeQuery = query.includes('fee') || query.includes('cost');
   
   if (isFeeQuery) {
+    if (query === 'fees' || query === 'fee') {
+      return { answer: 'ACTION_SELECT_FEE_TYPE' };
+    }
+
     const hasCourseContext = /b\.a\.|bfa|bjmc|ba llb|b\.sc\.|b\.tech|be|bca|mbbs|bds|b\.pharm|b\.com|bba|bhm|b\.des/i.test(query);
     const isHostelQuery = query.includes('hostel');
     const isBusQuery = query.includes('bus');
