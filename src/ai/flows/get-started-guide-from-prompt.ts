@@ -41,9 +41,9 @@ const prompt = ai.definePrompt({
   name: 'getStartedGuideFromPromptPrompt',
   input: {schema: GetStartedGuideFromPromptInputSchema},
   output: {schema: GetStartedGuideFromPromptOutputSchema},
-  prompt: `You are an AI assistant designed to provide prospective students with a detailed, step-by-step guide on how to get started in their field of study at our university.
+  prompt: `You are an AI assistant creating a short, personalized guide for a student.
 
-  Based on the student's interest and the information available about our university, craft a personalized guide that covers relevant courses, admission requirements, financial aid options, and student life.
+  Based on their interest, create a simple, one-paragraph guide.
 
   Student's Interest: {{{studyInterest}}}
   University Courses: {{{universityCourses}}}
@@ -51,8 +51,7 @@ const prompt = ai.definePrompt({
   Financial Aid Options: {{{financialAidOptions}}}
   Student Life Information: {{{studentLifeInfo}}}
 
-  The guide should be comprehensive and easy to follow. Structure your response with clear headings and paragraphs.
-  Be sure to include resources or contact information when necessary.
+  The guide should be a single, concise paragraph. Recommend one or two relevant courses and briefly mention the next steps for admission.
   `,
 });
 
