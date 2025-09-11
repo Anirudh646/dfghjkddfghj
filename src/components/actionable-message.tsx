@@ -7,14 +7,16 @@ import { Bot } from 'lucide-react';
 import Markdown from 'react-markdown';
 import type { Message } from './chat-message';
 import { Button } from './ui/button';
+import type { Course } from '@/lib/types';
 
 interface ActionableMessageProps {
   message: Message;
-  courses: string[];
+  courses: (Course | string)[];
   action: (course: string) => void;
+  displayEligibility?: boolean;
 }
 
-export function ActionableMessage({ message, courses, action }: ActionableMessageProps) {
+export function ActionableMessage({ message, courses, action, displayEligibility = false }: ActionableMessageProps) {
   return (
     <div className={cn('flex items-start gap-4 justify-start')}>
       <Avatar className="h-9 w-9 border">
@@ -27,16 +29,28 @@ export function ActionableMessage({ message, courses, action }: ActionableMessag
           <Markdown>{message.content}</Markdown>
         </article>
         <div className="mt-4 flex flex-wrap items-start gap-2">
-          {courses.map((course) => (
-            <Button
-              key={course}
-              variant="outline"
-              size="sm"
-              onClick={() => action(course)}
-            >
-              {course}
-            </Button>
-          ))}
+          {courses.map((course) => {
+            const isCourseObject = typeof course === 'object' && course !== null;
+            const title = isCourseObject ? (course as Course).title : course as string;
+            const eligibility = isCourseObject ? (course as Course).eligibility : '';
+
+            return (
+              <Button
+                key={title}
+                variant="outline"
+                size="sm"
+                onClick={() => action(title)}
+                className="h-auto"
+              >
+                <div className="flex flex-col items-start whitespace-normal text-left">
+                  <span>{title}</span>
+                  {displayEligibility && eligibility && (
+                    <span className="text-xs font-normal text-muted-foreground">{eligibility}</span>
+                  )}
+                </div>
+              </Button>
+            );
+          })}
         </div>
       </div>
     </div>

@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useActionState, useEffect, useRef, useState, useTransition } from 'react';
@@ -148,8 +149,9 @@ export function ChatInterface() {
             content: 'Here are the courses we offer. Select one to learn more.',
             component: 'CourseInfoSelector',
             componentProps: {
-              courses: courses.map((c) => c.title),
+              courses: courses,
               action: (course: string) => handleAction(course),
+              displayEligibility: true,
             },
           },
         ]);
