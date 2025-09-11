@@ -12,9 +12,15 @@ import { BookCheck, Briefcase, Milestone } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
 
 export async function CourseCard({ course }: { course: Course }) {
-  const summary = await summarizeCourseInformation({
-    courseDescription: course.description,
-  });
+  let summary;
+  try {
+    summary = await summarizeCourseInformation({
+      courseDescription: course.description,
+    });
+  } catch (error) {
+    console.error(`Failed to summarize course "${course.title}":`, error);
+    summary = null;
+  }
 
   return (
     <Card className="flex flex-col">
@@ -28,35 +34,49 @@ export async function CourseCard({ course }: { course: Course }) {
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-1 flex-col justify-between space-y-4">
-        <div>
-          <h3 className="mb-2 flex items-center gap-2 font-semibold">
-            <BookCheck className="h-5 w-5 text-primary" />
-            Core Content
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            {summary.coreContent}
-          </p>
-        </div>
+        {summary ? (
+          <>
+            <div>
+              <h3 className="mb-2 flex items-center gap-2 font-semibold">
+                <BookCheck className="h-5 w-5 text-primary" />
+                Core Content
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {summary.coreContent}
+              </p>
+            </div>
 
-        <div>
-          <h3 className="mb-2 flex items-center gap-2 font-semibold">
-            <Milestone className="h-5 w-5 text-primary" />
-            Prerequisites
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            {summary.prerequisites}
-          </p>
-        </div>
+            <div>
+              <h3 className="mb-2 flex items-center gap-2 font-semibold">
+                <Milestone className="h-5 w-5 text-primary" />
+                Prerequisites
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {summary.prerequisites}
+              </p>
+            </div>
 
-        <div>
-          <h3 className="mb-2 flex items-center gap-2 font-semibold">
-            <Briefcase className="h-5 w-5 text-primary" />
-            Potential Career Paths
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            {summary.potentialCareerPaths}
-          </p>
-        </div>
+            <div>
+              <h3 className="mb-2 flex items-center gap-2 font-semibold">
+                <Briefcase className="h-5 w-5 text-primary" />
+                Potential Career Paths
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {summary.potentialCareerPaths}
+              </p>
+            </div>
+          </>
+        ) : (
+          <div>
+            <h3 className="mb-2 flex items-center gap-2 font-semibold">
+              <BookCheck className="h-5 w-5 text-primary" />
+              Description
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              {course.description}
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
