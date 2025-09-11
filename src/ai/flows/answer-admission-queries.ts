@@ -56,7 +56,8 @@ const prompt = ai.definePrompt({
       [Semester/Term]) [Fee Amount]
       ...
   4.  For general fee inquiries (like hostel or bus fees), use the 'General Fees' information.
-  5.  If the requested information is not available, state that and suggest they contact the admissions office.
+  5. If the user asks a general question, answer in a helpful and clear paragraph.
+  6.  If the requested information is not available, state that and suggest they contact the admissions office.
   `,
 });
 

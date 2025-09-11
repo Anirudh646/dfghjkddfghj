@@ -51,7 +51,7 @@ const prompt = ai.definePrompt({
   Financial Aid Options: {{{financialAidOptions}}}
   Student Life Information: {{{studentLifeInfo}}}
 
-  The guide should be comprehensive and easy to follow. **You must format your response as a step-by-step guide as a single paragraph.**
+  The guide should be comprehensive and easy to follow. Structure your response with clear headings and paragraphs.
   Be sure to include resources or contact information when necessary.
   `,
 });
