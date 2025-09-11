@@ -27,12 +27,21 @@ const AnswerAdmissionQueryOutputSchema = z.object({
 export type AnswerAdmissionQueryOutput = z.infer<typeof AnswerAdmissionQueryOutputSchema>;
 
 export async function answerAdmissionQuery(input: AnswerAdmissionQueryInput): Promise<AnswerAdmissionQueryOutput> {
-  // A simple heuristic to detect if the user is asking about fees without specifying a course.
-  const isFeeQuery = input.query.toLowerCase().includes('fee') || input.query.toLowerCase().includes('cost');
-  const hasCourseContext = /computer science|business administration|jee|neet|mechanical|civil|commerce|history/i.test(input.query);
+  const query = input.query.toLowerCase();
+  const isFeeQuery = query.includes('fee') || query.includes('cost');
+  
+  if (isFeeQuery) {
+    const hasCourseContext = /b\.a\.|bfa|bjmc|ba llb|b\.sc\.|b\.tech|be|bca|mbbs|bds|b\.pharm|b\.com|bba|bhm|b\.des/i.test(query);
+    const isHostelQuery = query.includes('hostel');
+    const isBusQuery = query.includes('bus');
 
-  if (isFeeQuery && !hasCourseContext) {
-    return { answer: 'ACTION_SELECT_COURSE_FOR_FEES' };
+    if (hasCourseContext || isHostelQuery || isBusQuery) {
+      // If the query is specific, let the flow handle it.
+      return answerAdmissionQueryFlow(input);
+    } else {
+      // If it's a generic fee query, ask for clarification.
+      return { answer: 'ACTION_SELECT_FEE_TYPE' };
+    }
   }
   
   return answerAdmissionQueryFlow(input);

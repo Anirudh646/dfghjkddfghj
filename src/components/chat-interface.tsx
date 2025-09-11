@@ -114,7 +114,20 @@ export function ChatInterface() {
 
   useEffect(() => {
     if (aiState.answer) {
-      if (aiState.answer === 'ACTION_SELECT_COURSE_FOR_FEES') {
+      if (aiState.answer === 'ACTION_SELECT_FEE_TYPE') {
+        setMessages((prev) => [
+          ...prev,
+          { 
+            role: 'assistant', 
+            content: 'I can help with that. Are you interested in course fees, hostel fees, or bus fees?',
+            component: 'FeeTypeSelector',
+            componentProps: {
+              courses: ['Course Fees', 'Hostel Fees', 'Bus Fees'],
+              action: (feeType: string) => handleAction(feeType),
+            }
+          },
+        ]);
+      } else if (aiState.answer === 'ACTION_SELECT_COURSE_FOR_FEES') {
          setMessages((prev) => [
           ...prev,
           { 
@@ -163,7 +176,7 @@ export function ChatInterface() {
       <ScrollArea className="flex-1" ref={scrollAreaRef}>
         <div className="space-y-6 px-4 py-2">
           {messages.map((message, index) => {
-             if (message.component === 'CourseSelector' && message.componentProps) {
+             if ((message.component === 'CourseSelector' || message.component === 'FeeTypeSelector') && message.componentProps) {
               return (
                 <ActionableMessage key={index} message={message} {...message.componentProps} />
               )
