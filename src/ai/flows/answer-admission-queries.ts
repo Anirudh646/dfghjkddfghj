@@ -28,12 +28,12 @@ export type AnswerAdmissionQueryOutput = z.infer<typeof AnswerAdmissionQueryOutp
 
 export async function answerAdmissionQuery(input: AnswerAdmissionQueryInput): Promise<AnswerAdmissionQueryOutput> {
   const query = input.query.toLowerCase().trim();
-  const isFeeQuery = query.includes('fee') || query.includes('cost');
   
   if (query === 'course' || query === 'courses') {
     return { answer: 'ACTION_SELECT_COURSE_INFO' };
   }
 
+  const isFeeQuery = query.includes('fee') || query.includes('cost');
   if (isFeeQuery) {
     if (query === 'fees' || query === 'fee') {
       return { answer: 'ACTION_SELECT_FEE_TYPE' };
@@ -44,13 +44,11 @@ export async function answerAdmissionQuery(input: AnswerAdmissionQueryInput): Pr
     const isBusQuery = query.includes('bus');
 
     if (hasCourseContext || isHostelQuery || isBusQuery) {
-      // If the query is specific, let the flow handle it.
       return answerAdmissionQueryFlow(input);
     } else {
       if (query.includes('course')) {
         return { answer: 'ACTION_SELECT_COURSE_FOR_FEES' };
       }
-      // If it's a generic fee query, ask for clarification.
       return { answer: 'ACTION_SELECT_FEE_TYPE' };
     }
   }
@@ -62,11 +60,9 @@ const prompt = ai.definePrompt({
   name: 'answerAdmissionQueryPrompt',
   input: {schema: AnswerAdmissionQueryInputSchema},
   output: {schema: AnswerAdmissionQueryOutputSchema},
-  prompt: `You are an AI admission counselor for an Indian university. Your goal is to provide short, helpful, and easy-to-understand information to prospective students.
+  prompt: `You are an AI admission counselor for a university. Your goal is to provide concise, helpful, and accurate information to prospective students based *only* on the context provided.
 
-  Use the following information to answer the student's query. Be concise and helpful.
-
-  **Contextual Information:**
+  **Contextual Information (Use only this information to answer):**
   - **Course Details:** {{{courseDetails}}}
   - **General Fees (Hostel/Bus):** {{{feesInformation}}}
   - **Eligibility Criteria:** {{{eligibilityCriteria}}}
@@ -76,15 +72,16 @@ const prompt = ai.definePrompt({
   **Student Query:** {{{query}}}
 
   **Instructions:**
-  1.  Provide a short, direct answer in a single, easy-to-understand paragraph.
-  2.  When providing the fee structure for a course, format it as follows, with each semester on a new line:
+  1.  Answer the user's query directly and concisely using *only* the information provided in the context above.
+  2.  Do not add any information that is not present in the context.
+  3.  If the information is not available in the context, state that clearly and suggest contacting the admissions office for more details.
+  4.  When providing the fee structure for a course, format it as follows:
       **[Course Name]**
-      - **[Semester/Term]:** [Fee Amount]
-      - **[Semester/Term]:** [Fee Amount]
+      - **Annual Fee:** [Fee Amount]
+      - **Semester 1:** [Fee Amount]
+      - **Semester 2:** [Fee Amount]
       ...
-  3.  For general fee inquiries (like hostel or bus fees), use the 'General Fees' information.
-  4. If the user asks a general question, answer in a helpful and clear paragraph.
-  5.  If the requested information is not available, state that and suggest they contact the admissions office.
+  5.  Keep your answers short and to the point.
   `,
 });
 

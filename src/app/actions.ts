@@ -8,40 +8,28 @@ import { z } from 'zod';
 const getContextString = (query: string) => {
   const lowerQuery = query.toLowerCase();
   
-  let courseDetails = '';
-  // Be more specific about when to include all course details.
-  if (lowerQuery.includes('all courses') || lowerQuery.includes('list courses')) {
-    courseDetails = `Available courses: ${courses.map(c => c.title).join(', ')}`;
-  } else {
-    // Find specific course mentions
-    const mentionedCourse = courses.find(c => lowerQuery.includes(c.title.toLowerCase()));
-    if (mentionedCourse) {
-      const feeInfo = mentionedCourse.feeStructure ? ` Fee Structure: ${JSON.stringify(mentionedCourse.feeStructure)}` : '';
-      courseDetails = `${mentionedCourse.title} (${mentionedCourse.department}) - ${mentionedCourse.description}. Duration: ${mentionedCourse.duration}. Eligibility: ${mentionedCourse.eligibility}.${feeInfo}`;
-    } else if (lowerQuery.includes('course')) {
-        // If it's a generic course query but not asking for all, provide a summary.
-        courseDetails = `The university offers a variety of courses including: ${courses.map(c => c.title).join(', ')}. Ask about a specific one for more details.`;
-    }
+  let courseDetails: string | undefined;
+  const mentionedCourse = courses.find(c => lowerQuery.includes(c.title.toLowerCase()));
+
+  if (mentionedCourse) {
+    const feeInfo = mentionedCourse.feeStructure ? ` Fee Structure: ${JSON.stringify(mentionedCourse.feeStructure)}` : '';
+    courseDetails = `${mentionedCourse.title} (${mentionedCourse.department}) - ${mentionedCourse.description}. Duration: ${mentionedCourse.duration}. Eligibility: ${mentionedCourse.eligibility}.${feeInfo}`;
+  } else if (lowerQuery.includes('course') || lowerQuery.includes('program')) {
+    courseDetails = `The university offers a variety of undergraduate and professional programs. Key courses include: ${courses.map(c => c.title).join(', ')}. For detailed information, please ask about a specific course.`;
   }
 
   const feesInformation = (lowerQuery.includes('fee') || lowerQuery.includes('hostel') || lowerQuery.includes('bus')) ? generalInfo.fees : undefined;
-  const eligibilityCriteria = lowerQuery.includes('eligibility') ? generalInfo.eligibility : undefined;
+  const eligibilityCriteria = lowerQuery.includes('eligibility') || lowerQuery.includes('admission requirement') ? generalInfo.eligibility : undefined;
   const facilitiesInformation = lowerQuery.includes('facilities') || lowerQuery.includes('campus') ? generalInfo.facilities : undefined;
-  const contactInformation = lowerQuery.includes('contact') || lowerQuery.includes('help') ? `Key Contacts: ${contacts.map(c => `${c.name}, ${c.title}, Email: ${c.email}`).join('; ')}. For detailed contact info, please visit the contact page.` : undefined;
-  
-  const faqSummaries = lowerQuery.includes('faq') || lowerQuery.includes('question') ? `FAQs cover topics like deadlines ('${faqs[0].question}'), required documents ('${faqs[1].question}'), and fees ('${faqs[2].question}').` : undefined;
+  const contactInformation = lowerQuery.includes('contact') || lowerQuery.includes('help') ? `Key Contacts: ${contacts.map(c => `${c.name} (${c.title}) - ${c.email}`).join('; ')}. For more details, visit the contact page.` : undefined;
+  const faqSummaries = lowerQuery.includes('faq') || lowerQuery.includes('question') ? `Frequently asked questions cover topics like application deadlines, required documents, and scholarship opportunities. You can view all FAQs on the FAQ page.` : undefined;
 
-  let fullContactInfo = contactInformation;
-  if (faqSummaries) {
-    fullContactInfo = `${contactInformation || ''}. ${faqSummaries}`;
-  }
-  
   return {
-    courseDetails: courseDetails || undefined,
+    courseDetails,
     feesInformation,
     eligibilityCriteria,
     facilitiesInformation,
-    contactInformation: fullContactInfo,
+    contactInformation: contactInformation || faqSummaries,
   };
 };
 
