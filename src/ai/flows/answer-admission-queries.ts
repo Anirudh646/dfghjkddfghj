@@ -16,6 +16,8 @@ const AnswerAdmissionQueryInputSchema = z.object({
   courseDetails: z.string().optional().describe('Course details information, including course-specific fee structures.'),
   feesInformation: z.string().optional().describe('General fees related information, like hostel and bus fees.'),
   eligibilityCriteria: z.string().optional().describe('Eligibility criteria information.'),
+  applicationInfo: z.string().optional().describe('Information about the application process, steps, and deadlines.'),
+  scholarshipInfo: z.string().optional().describe('Information about available scholarships.'),
   facilitiesInformation: z.string().optional().describe('Facilities information.'),
   contactInformation: z.string().optional().describe('Contact information for help.'),
 });
@@ -31,6 +33,10 @@ export async function answerAdmissionQuery(input: AnswerAdmissionQueryInput): Pr
   
   if (query === 'course' || query === 'courses') {
     return { answer: 'ACTION_SELECT_COURSE_INFO' };
+  }
+
+  if (query === 'hi' || query === 'hello') {
+    return { answer: "Hello! I am the university's AI admission counselor. How can I assist you today? You can ask me about courses, fees, eligibility, and more." };
   }
 
   const isFeeQuery = query.includes('fee') || query.includes('cost');
@@ -66,6 +72,8 @@ const prompt = ai.definePrompt({
   - **Course Details:** {{{courseDetails}}}
   - **General Fees (Hostel/Bus):** {{{feesInformation}}}
   - **Eligibility Criteria:** {{{eligibilityCriteria}}}
+  - **Application Process & Deadlines:** {{{applicationInfo}}}
+  - **Scholarships:** {{{scholarshipInfo}}}
   - **Facilities:** {{{facilitiesInformation}}}
   - **Contact Information:** {{{contactInformation}}}
 
@@ -81,7 +89,9 @@ const prompt = ai.definePrompt({
       - **Semester 1:** [Fee Amount]
       - **Semester 2:** [Fee Amount]
       ...
-  5.  Keep your answers short and to the point.
+  5.  If asked about the application process, list the steps clearly.
+  6.  If asked about scholarships, summarize the available options.
+  7.  Keep your answers short and to the point.
   `,
 });
 
