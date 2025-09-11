@@ -140,6 +140,24 @@ export function ChatInterface() {
             }
           },
         ]);
+      } else if (aiState.answer === 'ACTION_CLARIFY_COURSE_QUERY') {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content:
+              'Hi! Could you clarify what you mean by "COURSE"? Are you looking for:',
+            component: 'CourseQueryClarification',
+            componentProps: {
+              courses: [
+                'Information on a university course',
+                'A course on a specific subject',
+                'An online course recommendation',
+              ],
+              action: (query: string) => handleAction(query),
+            },
+          },
+        ]);
       } else {
         setMessages((prev) => [
           ...prev,
@@ -176,7 +194,7 @@ export function ChatInterface() {
       <ScrollArea className="flex-1" ref={scrollAreaRef}>
         <div className="space-y-6 px-4 py-2">
           {messages.map((message, index) => {
-             if ((message.component === 'CourseSelector' || message.component === 'FeeTypeSelector') && message.componentProps) {
+             if ((message.component === 'CourseSelector' || message.component === 'FeeTypeSelector' || message.component === 'CourseQueryClarification') && message.componentProps) {
               return (
                 <ActionableMessage key={index} message={message} {...message.componentProps} />
               )

@@ -30,6 +30,10 @@ export async function answerAdmissionQuery(input: AnswerAdmissionQueryInput): Pr
   const query = input.query.toLowerCase().trim();
   const isFeeQuery = query.includes('fee') || query.includes('cost');
   
+  if (query === 'course' || query === 'courses') {
+    return { answer: 'ACTION_CLARIFY_COURSE_QUERY' };
+  }
+
   if (isFeeQuery) {
     if (query === 'fees' || query === 'fee') {
       return { answer: 'ACTION_SELECT_FEE_TYPE' };
@@ -43,6 +47,9 @@ export async function answerAdmissionQuery(input: AnswerAdmissionQueryInput): Pr
       // If the query is specific, let the flow handle it.
       return answerAdmissionQueryFlow(input);
     } else {
+      if (query.includes('course')) {
+        return { answer: 'ACTION_SELECT_COURSE_FOR_FEES' };
+      }
       // If it's a generic fee query, ask for clarification.
       return { answer: 'ACTION_SELECT_FEE_TYPE' };
     }
