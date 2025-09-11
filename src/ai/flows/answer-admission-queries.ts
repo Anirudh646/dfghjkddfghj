@@ -22,7 +22,7 @@ const AnswerAdmissionQueryInputSchema = z.object({
 export type AnswerAdmissionQueryInput = z.infer<typeof AnswerAdmissionQueryInputSchema>;
 
 const AnswerAdmissionQueryOutputSchema = z.object({
-  answer: z.string().describe('The AI-generated answer to the admission query, formatted as a single paragraph.'),
+  answer: z.string().describe('The AI-generated answer to the admission query.'),
 });
 export type AnswerAdmissionQueryOutput = z.infer<typeof AnswerAdmissionQueryOutputSchema>;
 
@@ -36,7 +36,7 @@ const prompt = ai.definePrompt({
   output: {schema: AnswerAdmissionQueryOutputSchema},
   prompt: `You are an AI admission counselor for an Indian university. Your goal is to provide helpful and accurate information to prospective students.
 
-  Use the following information to answer the student's query. Be concise and helpful. **All of your answers must be formatted as a single paragraph.**
+  Use the following information to answer the student's query. Be concise and helpful.
 
   **Contextual Information:**
   - **Course Details:** {{{courseDetails}}}
@@ -50,8 +50,12 @@ const prompt = ai.definePrompt({
   **Instructions:**
   1.  Carefully analyze the student's query to understand their needs.
   2.  If the query is about fees for a specific course, use the fee structure information provided within the 'Course Details' for that course.
-  3.  For general fee inquiries (like hostel or bus fees), use the 'General Fees' information.
-  4.  Provide a clear, well-structured answer as a single paragraph.
+  3.  When providing the fee structure for a course, format it as follows, with each semester on a new line:
+      [Course Name]
+      [Semester/Term]) [Fee Amount]
+      [Semester/Term]) [Fee Amount]
+      ...
+  4.  For general fee inquiries (like hostel or bus fees), use the 'General Fees' information.
   5.  If the requested information is not available, state that and suggest they contact the admissions office.
   `,
 });
