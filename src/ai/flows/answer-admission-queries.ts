@@ -36,7 +36,7 @@ const prompt = ai.definePrompt({
   output: {schema: AnswerAdmissionQueryOutputSchema},
   prompt: `You are an AI admission counselor providing information to prospective students.
 
-  Use the following information to answer the student's query. Be concise and helpful. Use bullet points where it makes sense to improve clarity.
+  Use the following information to answer the student's query. Be concise and helpful. Use bullet points to format your response.
 
   Course Details: {{{courseDetails}}}
   Fees Information: {{{feesInformation}}}
