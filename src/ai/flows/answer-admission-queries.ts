@@ -49,15 +49,16 @@ const prompt = ai.definePrompt({
 
   **Instructions:**
   1.  Provide a short, direct answer in a single, easy-to-understand paragraph.
-  2.  If the query is about fees for a specific course, use the fee structure information provided within the 'Course Details' for that course.
-  3.  When providing the fee structure for a course, format it as follows, with each semester on a new line:
+  2.  If the query is about fees but does not specify a course, ask the user to specify which course they are interested in.
+  3.  If the query is about fees for a specific course, use the fee structure information provided within the 'Course Details' for that course.
+  4.  When providing the fee structure for a course, format it as follows, with each semester on a new line:
       [Course Name]
       [Semester/Term]) [Fee Amount]
       [Semester/Term]) [Fee Amount]
       ...
-  4.  For general fee inquiries (like hostel or bus fees), use the 'General Fees' information.
-  5. If the user asks a general question, answer in a helpful and clear paragraph.
-  6.  If the requested information is not available, state that and suggest they contact the admissions office.
+  5.  For general fee inquiries (like hostel or bus fees), use the 'General Fees' information.
+  6. If the user asks a general question, answer in a helpful and clear paragraph.
+  7.  If the requested information is not available, state that and suggest they contact the admissions office.
   `,
 });
 
