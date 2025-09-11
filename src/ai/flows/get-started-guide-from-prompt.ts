@@ -25,7 +25,7 @@ export type GetStartedGuideFromPromptInput = z.infer<
 >;
 
 const GetStartedGuideFromPromptOutputSchema = z.object({
-  guide: z.string().describe('A step-by-step guide tailored to the student.'),
+  guide: z.string().describe('A step-by-step guide tailored to the student, formatted in bullet points.'),
 });
 export type GetStartedGuideFromPromptOutput = z.infer<
   typeof GetStartedGuideFromPromptOutputSchema
@@ -51,8 +51,7 @@ const prompt = ai.definePrompt({
   Financial Aid Options: {{{financialAidOptions}}}
   Student Life Information: {{{studentLifeInfo}}}
 
-  The guide should be comprehensive and easy to follow, providing clear instructions and helpful resources.
-  Format it as a step-by-step guide.
+  The guide should be comprehensive and easy to follow. **You must format your response as a step-by-step guide using bullet points.**
   Be sure to include resources or contact information when necessary.
   `,
 });

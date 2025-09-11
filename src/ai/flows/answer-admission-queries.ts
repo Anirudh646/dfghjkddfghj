@@ -22,7 +22,7 @@ const AnswerAdmissionQueryInputSchema = z.object({
 export type AnswerAdmissionQueryInput = z.infer<typeof AnswerAdmissionQueryInputSchema>;
 
 const AnswerAdmissionQueryOutputSchema = z.object({
-  answer: z.string().describe('The AI-generated answer to the admission query.'),
+  answer: z.string().describe('The AI-generated answer to the admission query, formatted in bullet points.'),
 });
 export type AnswerAdmissionQueryOutput = z.infer<typeof AnswerAdmissionQueryOutputSchema>;
 
@@ -36,7 +36,7 @@ const prompt = ai.definePrompt({
   output: {schema: AnswerAdmissionQueryOutputSchema},
   prompt: `You are an AI admission counselor for an Indian university. Your goal is to provide helpful and accurate information to prospective students.
 
-  Use the following information to answer the student's query. Be concise and helpful. Format your response using bullet points.
+  Use the following information to answer the student's query. Be concise and helpful. **All of your answers must be formatted using bullet points.**
 
   **Contextual Information:**
   - **Course Details:** {{{courseDetails}}}

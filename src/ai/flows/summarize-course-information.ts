@@ -21,13 +21,13 @@ export type SummarizeCourseInformationInput = z.infer<
 >;
 
 const SummarizeCourseInformationOutputSchema = z.object({
-  coreContent: z.string().describe('A summary of the core content of the course.'),
+  coreContent: z.string().describe('A summary of the core content of the course, as a bulleted list.'),
   prerequisites: z
     .string()
-    .describe('The prerequisites required to take the course.'),
+    .describe('The prerequisites required to take the course, as a bulleted list.'),
   potentialCareerPaths: z
     .string()
-    .describe('Potential career paths for students who complete the course.'),
+    .describe('Potential career paths for students who complete the course, as a bulleted list.'),
 });
 export type SummarizeCourseInformationOutput = z.infer<
   typeof SummarizeCourseInformationOutputSchema
@@ -43,7 +43,7 @@ const prompt = ai.definePrompt({
   name: 'summarizeCourseInformationPrompt',
   input: {schema: SummarizeCourseInformationInputSchema},
   output: {schema: SummarizeCourseInformationOutputSchema},
-  prompt: `You are an expert academic advisor. Please provide a summary of the core content, prerequisites, and potential career paths for the following course description. Use bullet points for each section.
+  prompt: `You are an expert academic advisor. Please provide a summary of the core content, prerequisites, and potential career paths for the following course description. **You must use bullet points for each section.**
 
 Course Description: {{{courseDescription}}}
 
