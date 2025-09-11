@@ -80,18 +80,19 @@ const prompt = ai.definePrompt({
   **Student Query:** {{{query}}}
 
   **Instructions:**
-  1.  Answer the user's query directly and concisely using *only* the information provided in the context above.
-  2.  Do not add any information that is not present in the context.
-  3.  If the information is not available in the context, state that clearly and suggest contacting the admissions office for more details.
-  4.  When providing the fee structure for a course, format it as follows:
+  1. Answer the user's query directly and concisely using *only* the information provided in the context above.
+  2. Do not add any information that is not present in the context.
+  3. If the information is not available in the context, state that clearly and suggest contacting the admissions office for more details.
+  4. When providing the fee structure for a course, format it as follows:
       **[Course Name]**
       - **Annual Fee:** [Fee Amount]
       - **Semester 1:** [Fee Amount]
       - **Semester 2:** [Fee Amount]
       ...
-  5.  If asked about the application process, list the steps clearly.
-  6.  If asked about scholarships, summarize the available options.
-  7.  Keep your answers short and to the point.
+  5. If asked about the application process, list the steps clearly.
+  6. If asked about scholarships, summarize the available options.
+  7. Keep your answers short and to the point.
+  8. If asked for a greeting, provide a friendly welcome message and briefly explain your capabilities.
   `,
 });
 
