@@ -43,15 +43,15 @@ const prompt = ai.definePrompt({
   name: 'summarizeCourseInformationPrompt',
   input: {schema: SummarizeCourseInformationInputSchema},
   output: {schema: SummarizeCourseInformationOutputSchema},
-  prompt: `You are an expert academic advisor. Please provide a summary of the core content, prerequisites, and potential career paths for the following course description:
+  prompt: `You are an expert academic advisor. Please provide a summary of the core content, prerequisites, and potential career paths for the following course description. Use bullet points for each section.
 
 Course Description: {{{courseDescription}}}
 
 Format your response as follows:
 
-Core Content: [summary of core content]
-Prerequisites: [list of prerequisites]
-Potential Career Paths: [list of potential career paths]`,
+Core Content: [summary of core content as bullet points]
+Prerequisites: [list of prerequisites as bullet points]
+Potential Career Paths: [list of potential career paths as bullet points]`,
 });
 
 const summarizeCourseInformationFlow = ai.defineFlow(

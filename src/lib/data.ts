@@ -33,6 +33,38 @@ export const courses: Course[] = [
     description: 'An intensive course for the National Eligibility cum Entrance Test (UG) for medical aspirants. The curriculum covers Physics, Chemistry, and Biology (Botany and Zoology) as per the latest NTA syllabus.',
     credits: 5,
   },
+  {
+    id: 'me101',
+    title: 'Mechanical Engineering',
+    department: 'Engineering',
+    code: 'ME101',
+    description: 'This course provides a strong foundation in mechanics, thermodynamics, and material science. It prepares students for careers in manufacturing, automotive, and aerospace industries, adhering to AICTE standards.',
+    credits: 4,
+  },
+  {
+    id: 'ce101',
+    title: 'Civil Engineering',
+    department: 'Engineering',
+    code: 'CE101',
+    description: 'Focuses on the design, construction, and maintenance of infrastructure projects like roads, bridges, and buildings. The curriculum is aligned with industry needs and government regulations in India.',
+    credits: 4,
+  },
+  {
+    id: 'bcom',
+    title: 'Bachelor of Commerce (B.Com)',
+    department: 'Commerce',
+    code: 'BCOM101',
+    description: 'A comprehensive degree covering accounting, finance, taxation, and business law. It prepares students for careers in chartered accountancy, banking, and financial services.',
+    credits: 3,
+  },
+  {
+    id: 'bahist',
+    title: 'Bachelor of Arts (History)',
+    department: 'Humanities',
+    code: 'HIST101',
+    description: 'Explores Indian and world history, from ancient civilizations to contemporary events. This program develops critical thinking and analytical skills, preparing students for careers in civil services, archaeology, and academia.',
+    credits: 3,
+  },
 ];
 
 export const contacts: Contact[] = [
