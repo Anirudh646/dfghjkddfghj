@@ -21,13 +21,13 @@ export type SummarizeCourseInformationInput = z.infer<
 >;
 
 const SummarizeCourseInformationOutputSchema = z.object({
-  coreContent: z.string().describe('A summary of the core content of the course, as a bulleted list.'),
+  coreContent: z.string().describe('A summary of the core content of the course, as a single paragraph.'),
   prerequisites: z
     .string()
-    .describe('The prerequisites required to take the course, as a bulleted list.'),
+    .describe('The prerequisites required to take the course, as a single paragraph.'),
   potentialCareerPaths: z
     .string()
-    .describe('Potential career paths for students who complete the course, as a bulleted list.'),
+    .describe('Potential career paths for students who complete the course, as a single paragraph.'),
 });
 export type SummarizeCourseInformationOutput = z.infer<
   typeof SummarizeCourseInformationOutputSchema
@@ -43,15 +43,15 @@ const prompt = ai.definePrompt({
   name: 'summarizeCourseInformationPrompt',
   input: {schema: SummarizeCourseInformationInputSchema},
   output: {schema: SummarizeCourseInformationOutputSchema},
-  prompt: `You are an expert academic advisor. Please provide a summary of the core content, prerequisites, and potential career paths for the following course description. **You must use bullet points for each section.**
+  prompt: `You are an expert academic advisor. Please provide a summary of the core content, prerequisites, and potential career paths for the following course description. **You must use a single paragraph for each section.**
 
 Course Description: {{{courseDescription}}}
 
 Format your response as follows:
 
-Core Content: [summary of core content as bullet points]
-Prerequisites: [list of prerequisites as bullet points]
-Potential Career Paths: [list of potential career paths as bullet points]`,
+Core Content: [summary of core content as a single paragraph]
+Prerequisites: [list of prerequisites as a single paragraph]
+Potential Career Paths: [list of potential career paths as a single paragraph]`,
 });
 
 const summarizeCourseInformationFlow = ai.defineFlow(
