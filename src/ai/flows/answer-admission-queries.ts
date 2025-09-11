@@ -31,7 +31,7 @@ export async function answerAdmissionQuery(input: AnswerAdmissionQueryInput): Pr
   const isFeeQuery = query.includes('fee') || query.includes('cost');
   
   if (query === 'course' || query === 'courses') {
-    return { answer: 'ACTION_CLARIFY_COURSE_QUERY' };
+    return { answer: 'ACTION_SELECT_COURSE_INFO' };
   }
 
   if (isFeeQuery) {
