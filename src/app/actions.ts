@@ -5,24 +5,43 @@ import { getStartedGuideFromPrompt } from '@/ai/flows/get-started-guide-from-pro
 import { courses, contacts, generalInfo, faqs } from '@/lib/data';
 import { z } from 'zod';
 
-const getContextString = () => {
-  const courseDetails = `Available courses: ${courses.map(c => {
-    const feeInfo = c.feeStructure ? ` Fee Structure: ${JSON.stringify(c.feeStructure)}` : '';
-    return `${c.title} (${c.department}) - ${c.description}. Duration: ${c.duration}. Eligibility: ${c.eligibility}.${feeInfo}`;
-  }).join('; ')}`;
+const getContextString = (query: string) => {
+  const lowerQuery = query.toLowerCase();
   
-  const feesInformation = generalInfo.fees;
-  const eligibilityCriteria = generalInfo.eligibility;
-  const facilitiesInformation = generalInfo.facilities;
-  const contactInformation = `Key Contacts: ${contacts.map(c => `${c.name}, ${c.title}, Email: ${c.email}`).join('; ')}. For detailed contact info, please visit the contact page.`;
-  const faqSummaries = `FAQs cover topics like deadlines ('${faqs[0].question}'), required documents ('${faqs[1].question}'), and fees ('${faqs[2].question}').`;
+  let courseDetails = '';
+  // Be more specific about when to include all course details.
+  if (lowerQuery.includes('all courses') || lowerQuery.includes('list courses')) {
+    courseDetails = `Available courses: ${courses.map(c => c.title).join(', ')}`;
+  } else {
+    // Find specific course mentions
+    const mentionedCourse = courses.find(c => lowerQuery.includes(c.title.toLowerCase()));
+    if (mentionedCourse) {
+      const feeInfo = mentionedCourse.feeStructure ? ` Fee Structure: ${JSON.stringify(mentionedCourse.feeStructure)}` : '';
+      courseDetails = `${mentionedCourse.title} (${mentionedCourse.department}) - ${mentionedCourse.description}. Duration: ${mentionedCourse.duration}. Eligibility: ${mentionedCourse.eligibility}.${feeInfo}`;
+    } else if (lowerQuery.includes('course')) {
+        // If it's a generic course query but not asking for all, provide a summary.
+        courseDetails = `The university offers a variety of courses including: ${courses.map(c => c.title).join(', ')}. Ask about a specific one for more details.`;
+    }
+  }
 
+  const feesInformation = (lowerQuery.includes('fee') || lowerQuery.includes('hostel') || lowerQuery.includes('bus')) ? generalInfo.fees : undefined;
+  const eligibilityCriteria = lowerQuery.includes('eligibility') ? generalInfo.eligibility : undefined;
+  const facilitiesInformation = lowerQuery.includes('facilities') || lowerQuery.includes('campus') ? generalInfo.facilities : undefined;
+  const contactInformation = lowerQuery.includes('contact') || lowerQuery.includes('help') ? `Key Contacts: ${contacts.map(c => `${c.name}, ${c.title}, Email: ${c.email}`).join('; ')}. For detailed contact info, please visit the contact page.` : undefined;
+  
+  const faqSummaries = lowerQuery.includes('faq') || lowerQuery.includes('question') ? `FAQs cover topics like deadlines ('${faqs[0].question}'), required documents ('${faqs[1].question}'), and fees ('${faqs[2].question}').` : undefined;
+
+  let fullContactInfo = contactInformation;
+  if (faqSummaries) {
+    fullContactInfo = `${contactInformation || ''}. ${faqSummaries}`;
+  }
+  
   return {
-    courseDetails,
+    courseDetails: courseDetails || undefined,
     feesInformation,
     eligibilityCriteria,
     facilitiesInformation,
-    contactInformation: `${contactInformation}. ${faqSummaries}`,
+    contactInformation: fullContactInfo,
   };
 };
 
@@ -39,7 +58,7 @@ export async function askAI(prevState: any, formData: FormData): Promise<{ answe
   const validQuery = validation.data;
 
   try {
-    const context = getContextString();
+    const context = getContextString(validQuery);
     const result = await answerAdmissionQuery({
       query: validQuery,
       ...context,
@@ -64,13 +83,13 @@ export async function getStarted(prevState: any, formData: FormData): Promise<{ 
   const validInterest = validation.data;
 
   try {
-    const context = getContextString();
+    const courseDetails = `Available courses: ${courses.map(c => `${c.title} - ${c.description}`).join('; ')}`;
     const result = await getStartedGuideFromPrompt({
       studyInterest: validInterest,
-      universityCourses: context.courseDetails,
-      admissionRequirements: context.eligibilityCriteria,
+      universityCourses: courseDetails,
+      admissionRequirements: generalInfo.eligibility,
       financialAidOptions: 'Information about financial aid is available on the university website and can be discussed with our financial aid advisors.',
-      studentLifeInfo: context.facilities,
+      studentLifeInfo: generalInfo.facilities,
     });
     return { guide: result.guide };
   } catch (e) {
