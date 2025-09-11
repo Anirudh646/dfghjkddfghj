@@ -13,6 +13,12 @@ export const courses: Course[] = [
     credits: 120,
     feeStructure: {
       'Annual Fee': 50000,
+      'Semester 1': 25000,
+      'Semester 2': 25000,
+      'Semester 3': 25000,
+      'Semester 4': 25000,
+      'Semester 5': 25000,
+      'Semester 6': 25000,
     },
   },
   {
@@ -26,6 +32,14 @@ export const courses: Course[] = [
     credits: 160,
     feeStructure: {
       'Annual Fee': 75000,
+      'Semester 1': 37500,
+      'Semester 2': 37500,
+      'Semester 3': 37500,
+      'Semester 4': 37500,
+      'Semester 5': 37500,
+      'Semester 6': 37500,
+      'Semester 7': 37500,
+      'Semester 8': 37500,
     },
   },
   {
@@ -39,6 +53,12 @@ export const courses: Course[] = [
     credits: 130,
     feeStructure: {
       'Annual Fee': 90000,
+      'Semester 1': 45000,
+      'Semester 2': 45000,
+      'Semester 3': 45000,
+      'Semester 4': 45000,
+      'Semester 5': 45000,
+      'Semester 6': 45000,
     },
   },
   {
@@ -52,6 +72,16 @@ export const courses: Course[] = [
     credits: 200,
     feeStructure: {
       'Annual Fee': 150000,
+      'Semester 1': 75000,
+      'Semester 2': 75000,
+      'Semester 3': 75000,
+      'Semester 4': 75000,
+      'Semester 5': 75000,
+      'Semester 6': 75000,
+      'Semester 7': 75000,
+      'Semester 8': 75000,
+      'Semester 9': 75000,
+      'Semester 10': 75000,
     },
   },
   // Science
@@ -66,6 +96,12 @@ export const courses: Course[] = [
     credits: 120,
     feeStructure: {
       'Annual Fee': 60000,
+      'Semester 1': 30000,
+      'Semester 2': 30000,
+      'Semester 3': 30000,
+      'Semester 4': 30000,
+      'Semester 5': 30000,
+      'Semester 6': 30000,
     },
   },
   {
@@ -79,6 +115,14 @@ export const courses: Course[] = [
     credits: 180,
     feeStructure: {
       'Annual Fee': 180000,
+      'Semester 1': 90000,
+      'Semester 2': 90000,
+      'Semester 3': 90000,
+      'Semester 4': 90000,
+      'Semester 5': 90000,
+      'Semester 6': 90000,
+      'Semester 7': 90000,
+      'Semester 8': 90000,
     },
   },
   {
@@ -92,6 +136,12 @@ export const courses: Course[] = [
     credits: 140,
     feeStructure: {
       'Annual Fee': 85000,
+      'Semester 1': 42500,
+      'Semester 2': 42500,
+      'Semester 3': 42500,
+      'Semester 4': 42500,
+      'Semester 5': 42500,
+      'Semester 6': 42500,
     },
   },
   {
@@ -105,6 +155,11 @@ export const courses: Course[] = [
     credits: 250,
     feeStructure: {
       'Annual Fee': 500000,
+      'Year 1': 500000,
+      'Year 2': 500000,
+      'Year 3': 500000,
+      'Year 4': 500000,
+      'Year 4.5': 250000,
     },
   },
   {
@@ -118,6 +173,10 @@ export const courses: Course[] = [
     credits: 220,
     feeStructure: {
       'Annual Fee': 350000,
+      'Year 1': 350000,
+      'Year 2': 350000,
+      'Year 3': 350000,
+      'Year 4': 350000,
     },
   },
   {
@@ -131,6 +190,14 @@ export const courses: Course[] = [
     credits: 170,
     feeStructure: {
       'Annual Fee': 120000,
+      'Semester 1': 60000,
+      'Semester 2': 60000,
+      'Semester 3': 60000,
+      'Semester 4': 60000,
+      'Semester 5': 60000,
+      'Semester 6': 60000,
+      'Semester 7': 60000,
+      'Semester 8': 60000,
     },
   },
   // Commerce / Management
@@ -145,6 +212,12 @@ export const courses: Course[] = [
     credits: 120,
     feeStructure: {
       'Annual Fee': 55000,
+      'Semester 1': 27500,
+      'Semester 2': 27500,
+      'Semester 3': 27500,
+      'Semester 4': 27500,
+      'Semester 5': 27500,
+      'Semester 6': 27500,
     },
   },
   {
@@ -158,6 +231,12 @@ export const courses: Course[] = [
     credits: 130,
     feeStructure: {
       'Annual Fee': 95000,
+      'Semester 1': 47500,
+      'Semester 2': 47500,
+      'Semester 3': 47500,
+      'Semester 4': 47500,
+      'Semester 5': 47500,
+      'Semester 6': 47500,
     },
   },
   // Professional Courses
@@ -172,6 +251,14 @@ export const courses: Course[] = [
     credits: 160,
     feeStructure: {
       'Annual Fee': 130000,
+      'Semester 1': 65000,
+      'Semester 2': 65000,
+      'Semester 3': 65000,
+      'Semester 4': 65000,
+      'Semester 5': 65000,
+      'Semester 6': 65000,
+      'Semester 7': 65000,
+      'Semester 8': 65000,
     },
   },
   {
@@ -185,6 +272,14 @@ export const courses: Course[] = [
     credits: 160,
     feeStructure: {
       'Annual Fee': 160000,
+      'Semester 1': 80000,
+      'Semester 2': 80000,
+      'Semester 3': 80000,
+      'Semester 4': 80000,
+      'Semester 5': 80000,
+      'Semester 6': 80000,
+      'Semester 7': 80000,
+      'Semester 8': 80000,
     },
   },
 ];
