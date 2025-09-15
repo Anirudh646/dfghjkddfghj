@@ -58,6 +58,14 @@ export async function answerAdmissionQuery(input: AnswerAdmissionQueryInput): Pr
       return { answer: 'ACTION_SELECT_FEE_TYPE' };
     }
   }
+
+  const isCourseQuery = query.includes('course') || query.includes('program');
+  const hasSpecificCourse = /b\.a\.|bfa|bjmc|ba llb|b\.sc\.|b\.tech|be|bca|mbbs|bds|b\.pharm|b\.com|bba|bhm|b\.des/i.test(query);
+
+  if (isCourseQuery && !hasSpecificCourse && query !== 'course' && query !== 'courses') {
+      // Handles queries like "tell me about courses" but not just "courses"
+      return { answer: 'ACTION_SELECT_COURSE_INFO' };
+  }
   
   return answerAdmissionQueryFlow(input);
 }
@@ -83,12 +91,7 @@ const prompt = ai.definePrompt({
   1. Answer the user's query directly and concisely using *only* the information provided in the context above.
   2. Do not add any information that is not present in the context.
   3. If the information is not available in the context, state that clearly and suggest contacting the admissions office for more details.
-  4. When providing the fee structure for a course, format it as follows:
-      **[Course Name]**
-      - **Annual Fee:** [Fee Amount]
-      - **Semester 1:** [Fee Amount]
-      - **Semester 2:** [Fee Amount]
-      ...
+  4. When providing the fee structure for a course, list it out clearly. If both annual and semester fees are available, provide both.
   5. If asked about the application process, list the steps clearly.
   6. If asked about scholarships, summarize the available options.
   7. Keep your answers short and to the point.
