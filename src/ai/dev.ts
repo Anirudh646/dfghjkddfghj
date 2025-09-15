@@ -1,5 +1,3 @@
-import { config } from 'dotenv';
-config();
 
 import '@/ai/flows/answer-admission-queries.ts';
 import '@/ai/flows/summarize-course-information.ts';
