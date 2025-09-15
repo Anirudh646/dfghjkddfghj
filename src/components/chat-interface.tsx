@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { courses } from '@/lib/data';
 import { ActionableMessage } from './actionable-message';
+import { Logo } from '@/components/logo';
 
 function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: string }) {
   const { pending } = useFormStatus();
@@ -38,22 +39,31 @@ function InitialOptions({ onOptionClick }: { onOptionClick: (option: string) => 
   const options = ['Courses', 'Fees', 'Eligibility Criteria'];
 
   return (
-    <div className="flex h-full items-center justify-center p-4">
-      <Card className="w-full max-w-lg">
-        <CardHeader>
-          <CardTitle>Welcome to the AI Admission Counselor</CardTitle>
-          <CardDescription>
-            How can I help you today? Select an option below or type your question in the chat.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-          {options.map((option) => (
-            <Button key={option} variant="outline" size="lg" onClick={() => onOptionClick(option)}>
-              {option}
-            </Button>
-          ))}
-        </CardContent>
-      </Card>
+    <div className="flex h-full flex-col items-center justify-center p-4">
+      <div className="w-full max-w-lg text-center">
+        <Logo className="mb-8 justify-center" />
+        <Card className="bg-card/80 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold">Welcome to the AI Admission Counselor</CardTitle>
+            <CardDescription className="text-lg">
+              How can I help you today? Select an option below or type your question.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+            {options.map((option) => (
+              <Button
+                key={option}
+                variant="outline"
+                size="lg"
+                onClick={() => onOptionClick(option)}
+                className="w-full transition-transform hover:scale-105"
+              >
+                {option}
+              </Button>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

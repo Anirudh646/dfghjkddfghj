@@ -16,7 +16,7 @@ export function Logo({ className, hideText = false }: { className?: string; hide
       </div>
       {!hideText && (
         <span className="text-xl font-bold tracking-tight text-foreground">
-          University AI
+          CampusConnect AI
         </span>
       )}
     </div>
