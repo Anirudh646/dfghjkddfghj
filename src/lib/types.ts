@@ -38,4 +38,7 @@ export type GeneralInfo = {
   fees: string;
   eligibility: string;
   facilities: string;
+  entranceExams: string;
+  applicationStatus: string;
+  internationalAdmissions: string;
 };

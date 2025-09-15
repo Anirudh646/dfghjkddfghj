@@ -325,30 +325,136 @@ export const contacts: Contact[] = [
 ];
 
 export const faqs: FaqItem[] = [
+  // General Admission Queries
   {
     id: 'faq1',
-    question: 'What are the application deadlines?',
-    answer: 'The application deadline for the main session is typically in April. Please check the official websites for JEE, NEET, or the university for exact dates.',
+    question: 'What are the eligibility criteria for admission?',
+    answer: 'Eligibility criteria vary by course. Generally, applicants must have passed the Class 12 (or equivalent) examination. Specific stream requirements (like PCM for Engineering or PCB for Medical) and minimum percentage criteria apply for most programs. Please check the specific course page for detailed information.',
   },
   {
     id: 'faq2',
-    question: 'What documents are required for admission?',
-    answer: 'You will need to submit your Class 10th and 12th mark sheets, a valid photo ID (like Aadhar), passport-sized photographs, and category certificate (if applicable).',
+    question: 'What is the admission process or procedure?',
+    answer: 'The admission process includes: 1. Registering on the official portal. 2. Filling out the application form. 3. Uploading required documents. 4. Paying the application fee. 5. Appearing for entrance exams (if applicable). 6. Participating in counseling and seat allotment.',
   },
   {
     id: 'faq3',
-    question: 'Is there an application fee?',
-    answer: 'Yes, application fees vary by examination and university. Fee waivers are often available for reserved categories as per government norms.',
+    question: 'When does the admission process start and end?',
+    answer: 'The admission process for the main session typically starts in March and ends by July. The Fall session deadline is April 30th, and the Spring session is November 30th. Please monitor the official university website for exact dates.',
   },
   {
     id: 'faq4',
-    question: 'Can I apply for scholarships?',
-    answer: 'Absolutely. We offer merit-based and need-based scholarships. Additionally, students can apply for various government scholarships through the National Scholarship Portal.',
+    question: 'Is the admission form available online or offline?',
+    answer: 'Admission forms are available exclusively online through our official admission portal. We do not provide offline application forms.',
   },
   {
     id: 'faq5',
-    question: 'What are the on-campus housing options?',
-    answer: 'We offer separate hostel facilities for boys and girls with options for AC and non-AC rooms. Mess facilities provide a variety of Indian cuisine.',
+    question: 'What are the application deadlines?',
+    answer: 'The application deadline for the main session is typically in April. For exact dates regarding entrance exams like JEE and NEET, or university-specific deadlines, please check the respective official websites.',
+  },
+  {
+    id: 'faq6',
+    question: 'What documents are required for admission?',
+    answer: 'You will need to submit your Class 10th and 12th mark sheets, a valid government-issued photo ID (like Aadhar Card), passport-sized photographs, and a category certificate (if applicable).',
+  },
+  {
+    id: 'faq7',
+    question: 'Is there an entrance exam? If so, what is the syllabus and pattern?',
+    answer: 'Yes, admission to professional courses like Engineering (B.Tech), Medicine (MBBS), and Law (BA LLB) is based on national-level entrance exams (JEE Main, NEET UG, CLAT). The syllabus and pattern are determined by the conducting authorities of these exams.',
+  },
+  {
+    id: 'faq8',
+    question: 'What are the important dates (admission test, interview, counseling)?',
+    answer: 'All important dates, including test schedules, interview calls, and counseling dates, are published on the university\'s official admissions page. Please check it regularly for updates.',
+  },
+  {
+    id: 'faq9',
+    question: 'How do I check the status of my application?',
+    answer: 'You can check your application status by logging into the admission portal with the credentials you received during registration.',
+  },
+  {
+    id: 'faq10',
+    question: 'What is the mode of instruction (online, offline, hybrid)?',
+    answer: 'All our programs are conducted in a full-time, offline (in-person) mode at the campus. We do not currently offer hybrid or fully online degree programs.',
+  },
+  // Fee & Payment Queries
+  {
+    id: 'faq11',
+    question: 'What is the fee structure for the program?',
+    answer: 'The fee structure varies for each program. Please select a specific course on our "Courses" page to view detailed fee information, including annual and semester-wise breakdowns.',
+  },
+  {
+    id: 'faq12',
+    question: 'Is there any scholarship or financial aid available?',
+    answer: 'Yes, we offer merit-based and need-based scholarships. Students can also apply for various government scholarships through the National Scholarship Portal. Please visit our Financial Aid office for more details.',
+  },
+  {
+    id: 'faq13',
+    question: 'Are there installment options for fee payment?',
+    answer: 'Yes, fees can be paid on a semester-wise or annual basis. We do not offer further monthly installment plans, but we have tie-ups with banks for education loans.',
+  },
+  {
+    id: 'faq14',
+    question: 'Is the application fee refundable?',
+    answer: 'The application fee is non-refundable under any circumstances.',
+  },
+  {
+    id: 'faq15',
+    question: 'What modes of payment are accepted?',
+    answer: 'We accept online payments through net banking, credit cards, debit cards, and UPI. We do not accept cash payments for tuition or application fees.',
+  },
+  // Quota & Reservation Queries
+  {
+    id: 'faq16',
+    question: 'Are there any reserved seats (SC/ST/OBC/EWS/PWD)?',
+    answer: 'Yes, we adhere to the reservation policies mandated by the Government of India for all our programs. Seats are reserved for SC, ST, OBC, EWS, and PWD categories.',
+  },
+  {
+    id: 'faq17',
+    question: 'Is there a management or donation quota?',
+    answer: 'No, admissions are strictly based on merit and entrance exam scores. We do not have a management quota or accept donations for admission.',
+  },
+  // Accommodation & Campus Facilities
+  {
+    id: 'faq18',
+    question: 'Is hostel accommodation available?',
+    answer: 'Yes, we offer separate, fully-furnished hostel facilities for boys and girls with options for AC and non-AC rooms.',
+  },
+  {
+    id: 'faq19',
+    question: 'What are the hostel fees and facilities?',
+    answer: 'Hostel fees are ₹60,000 per year, which includes lodging and mess facilities. Hostels are equipped with Wi-Fi, common rooms, and 24/7 security.',
+  },
+  {
+    id: 'faq20',
+    question: 'What are the campus amenities (library, labs, Wi-Fi, etc.)?',
+    answer: 'Our campus is equipped with state-of-the-art facilities, including a 24/7 central library, modern laboratories for all departments, high-speed Wi-Fi across the campus, a sports complex, and multiple canteens.',
+  },
+  // International Student Queries
+  {
+    id: 'faq21',
+    question: 'Is admission open to international students?',
+    answer: 'Yes, we welcome applications from international students. There is a separate admission process and a dedicated international admissions office to assist you.',
+  },
+  {
+    id: 'faq22',
+    question: 'What are the visa requirements?',
+    answer: 'International students must obtain a valid student visa from the Indian embassy in their country. The university will provide the necessary documentation to support your visa application upon successful admission.',
+  },
+  // Post-Admission Queries
+  {
+    id: 'faq23',
+    question: 'When will the classes start?',
+    answer: 'The academic session for newly admitted students typically begins in the first week of August. You will receive a detailed academic calendar upon admission.',
+  },
+  {
+    id: 'faq24',
+    question: 'How do I get my ID card or enrollment number?',
+    answer: 'ID cards and enrollment numbers are issued within the first week of the commencement of classes. You will be notified of the schedule for the same.',
+  },
+  {
+    id: 'faq25',
+    question: 'What is the process for withdrawal or refund?',
+    answer: 'The withdrawal and refund policy is governed by UGC guidelines. Please refer to the admission brochure or contact the admissions office for detailed information on the procedure and refund eligibility.',
   },
 ];
 
@@ -374,4 +480,7 @@ export const generalInfo: GeneralInfo = {
   fees: 'Tuition fees vary by course. Please ask about a specific course for detailed fee information. Hostel fees are ₹60,000 per year, and bus fees are ₹20,000 per year. These fees are subject to revision.',
   eligibility: 'Eligibility criteria vary by course. Generally, applicants must have passed the Class 12 (or equivalent) examination. Specific stream requirements (like PCM for Engineering or PCB for Medical) and minimum percentage criteria apply for most programs. Admission may also be based on national-level entrance exams.',
   facilities: 'Our campus boasts state-of-the-art facilities, including modern laboratories, a 24/7 library, a sports complex with cricket and football grounds, multiple canteens, and student common rooms. High-speed Wi-Fi is available across the entire campus.',
+  entranceExams: 'Admission to professional courses like Engineering (B.Tech), Medicine (MBBS), and Law (BA LLB) is based on national-level entrance exams (JEE Main, NEET UG, CLAT respectively).',
+  applicationStatus: 'You can check your application status by logging into the admission portal with the credentials provided during registration.',
+  internationalAdmissions: 'Yes, we welcome international students. Please contact our international admissions office for details on the application process, visa requirements, and fees.',
 };

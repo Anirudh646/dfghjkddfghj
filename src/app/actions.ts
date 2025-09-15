@@ -14,23 +14,45 @@ const getContextString = (query: string) => {
   if (mentionedCourse) {
     const feeInfo = mentionedCourse.feeStructure ? ` Fee Structure: ${JSON.stringify(mentionedCourse.feeStructure)}` : '';
     courseDetails = `${mentionedCourse.title} (${mentionedCourse.department}) - ${mentionedCourse.description}. Duration: ${mentionedCourse.duration}. Eligibility: ${mentionedCourse.eligibility}.${feeInfo}`;
-  } else if (lowerQuery.includes('course') || lowerQuery.includes('program')) {
+  } else if (lowerQuery.includes('course') || lowerQuery.includes('program') || lowerQuery.includes('curriculum') || lowerQuery.includes('syllabus')) {
     courseDetails = `The university offers a variety of undergraduate and professional programs. Key courses include: ${courses.map(c => c.title).join(', ')}. For detailed information, please ask about a specific course.`;
   }
 
-  const feesInformation = (lowerQuery.includes('fee') || lowerQuery.includes('cost') || lowerQuery.includes('hostel') || lowerQuery.includes('bus')) ? generalInfo.fees : undefined;
+  const feesInformation = (lowerQuery.includes('fee') || lowerQuery.includes('cost') || lowerQuery.includes('hostel') || lowerQuery.includes('bus') || lowerQuery.includes('payment') || lowerQuery.includes('installment')) ? generalInfo.fees : undefined;
   const eligibilityCriteria = lowerQuery.includes('eligibility') || lowerQuery.includes('admission requirement') ? generalInfo.eligibility : undefined;
   
   let applicationInfo: string | undefined;
-  if (lowerQuery.includes('application') || lowerQuery.includes('apply') || lowerQuery.includes('admission') || lowerQuery.includes('deadline')) {
+  if (lowerQuery.includes('application') || lowerQuery.includes('apply') || lowerQuery.includes('admission') || lowerQuery.includes('deadline') || lowerQuery.includes('process') || lowerQuery.includes('procedure')) {
     applicationInfo = `Application Steps: ${generalInfo.applicationSteps.join(' ')} Deadlines: Fall - ${generalInfo.applicationDeadlines.fall}, Spring - ${generalInfo.applicationDeadlines.spring}. Required Documents: ${generalInfo.requiredDocuments.join(', ')}.`;
   }
 
   const scholarshipInfo = lowerQuery.includes('scholarship') || lowerQuery.includes('financial aid') ? `The university offers merit-based and need-based scholarships. Students can also apply for various government scholarships. For more details, please check the university's official website or contact the financial aid office.` : undefined;
 
-  const facilitiesInformation = lowerQuery.includes('facilities') || lowerQuery.includes('campus') ? generalInfo.facilities : undefined;
+  const facilitiesInformation = lowerQuery.includes('facilities') || lowerQuery.includes('campus') || lowerQuery.includes('amenities') || lowerQuery.includes('accommodation') || lowerQuery.includes('hostel') ? generalInfo.facilities : undefined;
   const contactInformation = lowerQuery.includes('contact') || lowerQuery.includes('help') ? `Key Contacts: ${contacts.map(c => `${c.name} (${c.title}) - ${c.email}`).join('; ')}. For more details, visit the contact page.` : undefined;
-  const faqSummaries = lowerQuery.includes('faq') || lowerQuery.includes('question') ? `Frequently asked questions cover topics like application deadlines, required documents, and scholarship opportunities. You can view all FAQs on the FAQ page.` : undefined;
+  
+  const faqSummaries = faqs.map(faq => {
+    const questionWords = faq.question.toLowerCase().split(' ');
+    if (questionWords.some(word => lowerQuery.includes(word))) {
+      return faq.answer;
+    }
+    return undefined;
+  }).filter(Boolean).join(' ');
+
+  let entranceExamInfo: string | undefined;
+  if (lowerQuery.includes('exam') || lowerQuery.includes('test') || lowerQuery.includes('syllabus') || lowerQuery.includes('pattern')) {
+    entranceExamInfo = generalInfo.entranceExams;
+  }
+
+  let applicationStatusInfo: string | undefined;
+  if (lowerQuery.includes('status')) {
+    applicationStatusInfo = generalInfo.applicationStatus;
+  }
+
+  let internationalInfo: string | undefined;
+  if (lowerQuery.includes('international') || lowerQuery.includes('foreign') || lowerQuery.includes('visa')) {
+    internationalInfo = generalInfo.internationalAdmissions;
+  }
 
   return {
     courseDetails,
@@ -39,7 +61,7 @@ const getContextString = (query: string) => {
     applicationInfo,
     scholarshipInfo,
     facilitiesInformation,
-    contactInformation: contactInformation || faqSummaries,
+    contactInformation: contactInformation || faqSummaries || entranceExamInfo || applicationStatusInfo || internationalInfo,
   };
 };
 
