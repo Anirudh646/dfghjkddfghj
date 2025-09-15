@@ -3,7 +3,7 @@
 
 import React, { useActionState, useEffect, useRef, useState, useTransition } from 'react';
 import { useFormStatus } from 'react-dom';
-import { ArrowUp, LoaderCircle } from 'lucide-react';
+import { ArrowUp, LoaderCircle, Search } from 'lucide-react';
 
 import { askAI } from '@/app/actions';
 import { Button } from '@/components/ui/button';
@@ -35,8 +35,19 @@ function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: st
 
 const initialAIState: { answer?: string; error?: string } = {};
 
-function InitialOptions({ onOptionClick }: { onOptionClick: (option: string) => void }) {
+function InitialOptions({ onOptionClick, onQuerySubmit }: { onOptionClick: (option: string) => void; onQuerySubmit: (query: string) => void; }) {
   const options = ['Courses', 'Fees', 'Eligibility Criteria'];
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const query = formData.get('query') as string;
+    if (query.trim()) {
+      onQuerySubmit(query);
+      formRef.current?.reset();
+    }
+  };
 
   return (
     <div className="flex h-full flex-col items-center justify-center p-4">
@@ -49,18 +60,28 @@ function InitialOptions({ onOptionClick }: { onOptionClick: (option: string) => 
               How can I help you today? Select an option below or type your question.
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            {options.map((option) => (
-              <Button
-                key={option}
-                variant="outline"
-                size="lg"
-                onClick={() => onOptionClick(option)}
-                className="w-full transition-transform hover:scale-105"
-              >
-                {option}
-              </Button>
-            ))}
+          <CardContent className="flex flex-col items-center justify-center gap-4">
+             <form ref={formRef} onSubmit={handleSubmit} className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Input
+                name="query"
+                placeholder="Ask a question..."
+                className="w-full rounded-full bg-background/80 pl-10 pr-4 py-3 text-lg"
+              />
+            </form>
+            <div className="flex w-full flex-col gap-4 sm:flex-row">
+              {options.map((option) => (
+                <Button
+                  key={option}
+                  variant="outline"
+                  size="lg"
+                  onClick={() => onOptionClick(option)}
+                  className="w-full transition-transform hover:scale-105"
+                >
+                  {option}
+                </Button>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -97,6 +118,10 @@ export function ChatInterface() {
     });
 
     setShowChat(true);
+  };
+  
+  const handleQuerySubmit = (query: string) => {
+    startChat(query);
   };
 
   const handleAction = (query: string) => {
@@ -218,7 +243,7 @@ export function ChatInterface() {
   };
   
   if (!showChat) {
-    return <InitialOptions onOptionClick={startChat} />;
+    return <InitialOptions onOptionClick={startChat} onQuerySubmit={handleQuerySubmit} />;
   }
 
 
@@ -286,3 +311,5 @@ export function ChatInterface() {
     </div>
   );
 }
+
+    
