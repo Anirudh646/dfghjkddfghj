@@ -151,12 +151,11 @@ export function ChatInterface() {
         if (isSpecificCourseQuery && aiState.answer !== "Hello! I am the university's AI admission counselor. How can I assist you today? You can ask me about courses, fees, eligibility, and more.") {
            newMessages.push({
             role: 'assistant',
-            content: 'You can select another course to learn more.',
-            component: 'CourseInfoSelector',
+            content: 'What would you like to know next?',
+            component: 'FeeTypeSelector', // Re-using for general options
             componentProps: {
-              courses: courses,
-              action: (course: string) => handleAction(course),
-              displayEligibility: true,
+              courses: ['Courses', 'Fees', 'Eligibility Criteria'],
+              action: (option: string) => handleAction(option),
             },
           });
         }
