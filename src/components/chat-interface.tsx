@@ -34,52 +34,31 @@ function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: st
 }
 
 const initialAIState: { answer?: string; error?: string } = {};
-const initialGuideState: { guide?: string; error?: string } = {};
 
-function GetStarted({ onGuideReceived }: { onGuideReceived: (guide: string) => void }) {
-  const [state, formAction] = useActionState(getStarted, initialGuideState);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (state.guide) {
-      onGuideReceived(state.guide);
-    }
-    if (state.error) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: state.error,
-      });
-    }
-  }, [state, onGuideReceived, toast]);
+function InitialOptions({ onOptionClick }: { onOptionClick: (option: string) => void }) {
+  const options = ['Courses', 'Fees', 'Eligibility Criteria'];
 
   return (
     <div className="flex h-full items-center justify-center p-4">
       <Card className="w-full max-w-lg">
-        <form action={formAction}>
-          <CardHeader>
-            <CardTitle>Welcome to the AI Admission Counselor</CardTitle>
-            <CardDescription>
-              Tell us what you're interested in studying, and we'll create a personalized guide to help you get started on your academic journey.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Textarea
-              name="studyInterest"
-              placeholder="For example: 'Mechanical Engineering', 'BBA', or 'JEE Preparation'"
-              rows={3}
-              required
-            />
-             {state.error && <p className="mt-2 text-sm text-destructive">{state.error}</p>}
-          </CardContent>
-          <CardFooter>
-            <SubmitButton label="Get My Personalised Guide" pendingLabel="Generating..." />
-          </CardFooter>
-        </form>
+        <CardHeader>
+          <CardTitle>Welcome to the AI Admission Counselor</CardTitle>
+          <CardDescription>
+            How can I help you today? Select an option below or type your question in the chat.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+          {options.map((option) => (
+            <Button key={option} variant="outline" size="lg" onClick={() => onOptionClick(option)}>
+              {option}
+            </Button>
+          ))}
+        </CardContent>
       </Card>
     </div>
   );
 }
+
 
 export function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -90,17 +69,24 @@ export function ChatInterface() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  const handleGuideReceived = (guide: string) => {
+  const handleOptionClick = (option: string) => {
     setMessages([
       {
         role: 'assistant',
         content: "Hello! I'm your AI admission counselor. How can I help you today?",
       },
       {
-        role: 'assistant',
-        content: `Here is a personalized guide to get you started:\n\n${guide}`,
+        role: 'user',
+        content: option
       }
     ]);
+
+    const formData = new FormData();
+    formData.append('query', option);
+    startTransition(() => {
+      formAction(formData);
+    });
+
     setShowChat(true);
   };
 
@@ -182,9 +168,31 @@ export function ChatInterface() {
     }
   }, [messages]);
 
+  const startChat = (initialQuery?: string) => {
+    const greetingMessage = {
+      role: 'assistant',
+      content: "Hello! I am the university's AI admission counselor. How can I assist you today? You can ask me about courses, fees, eligibility, and more."
+    } as Message;
+    
+    let initialMessages = [greetingMessage];
+
+    if (initialQuery) {
+      initialMessages.push({ role: 'user', content: initialQuery });
+      const formData = new FormData();
+      formData.append('query', initialQuery);
+      startTransition(() => {
+        formAction(formData);
+      });
+    }
+    
+    setMessages(initialMessages);
+    setShowChat(true);
+  };
+  
   if (!showChat) {
-    return <GetStarted onGuideReceived={handleGuideReceived} />;
+    return <InitialOptions onOptionClick={startChat} />;
   }
+
 
   return (
     <div className="flex h-[calc(100vh-8rem)] flex-col">
@@ -214,10 +222,15 @@ export function ChatInterface() {
           action={(formData) => {
             const query = formData.get('query') as string;
             if (query.trim() && !isPending) {
-              setMessages((prev) => [...prev, { role: 'user', content: query }]);
-              startTransition(() => {
-                formAction(formData);
-              });
+              
+              if (messages.length === 0) {
+                 startChat(query);
+              } else {
+                 setMessages((prev) => [...prev, { role: 'user', content: query }]);
+                startTransition(() => {
+                  formAction(formData);
+                });
+              }
               formRef.current?.reset();
             }
           }}
@@ -230,6 +243,11 @@ export function ChatInterface() {
             className="flex-1"
             required
             disabled={isPending}
+            onFocus={() => {
+              if (messages.length === 0) {
+                startChat();
+              }
+            }}
           />
           <Button type="submit" size="icon" disabled={isPending}>
             <ArrowUp />

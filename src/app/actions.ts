@@ -18,11 +18,11 @@ const getContextString = (query: string) => {
     courseDetails = `The university offers a variety of undergraduate and professional programs. Key courses include: ${courses.map(c => c.title).join(', ')}. For detailed information, please ask about a specific course.`;
   }
 
-  const feesInformation = (lowerQuery.includes('fee') || lowerQuery.includes('hostel') || lowerQuery.includes('bus')) ? generalInfo.fees : undefined;
+  const feesInformation = (lowerQuery.includes('fee') || lowerQuery.includes('cost') || lowerQuery.includes('hostel') || lowerQuery.includes('bus')) ? generalInfo.fees : undefined;
   const eligibilityCriteria = lowerQuery.includes('eligibility') || lowerQuery.includes('admission requirement') ? generalInfo.eligibility : undefined;
   
   let applicationInfo: string | undefined;
-  if (lowerQuery.includes('application') || lowerQuery.includes('apply') || lowerQuery.includes('admission')) {
+  if (lowerQuery.includes('application') || lowerQuery.includes('apply') || lowerQuery.includes('admission') || lowerQuery.includes('deadline')) {
     applicationInfo = `Application Steps: ${generalInfo.applicationSteps.join(' ')} Deadlines: Fall - ${generalInfo.applicationDeadlines.fall}, Spring - ${generalInfo.applicationDeadlines.spring}. Required Documents: ${generalInfo.requiredDocuments.join(', ')}.`;
   }
 
