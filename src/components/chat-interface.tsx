@@ -5,15 +5,14 @@ import React, { useActionState, useEffect, useRef, useState, useTransition } fro
 import { useFormStatus } from 'react-dom';
 import { ArrowUp, LoaderCircle } from 'lucide-react';
 
-import { askAI, getStarted } from '@/app/actions';
+import { askAI } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ChatMessage, type Message } from '@/components/chat-message';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
-import { Textarea } from './ui/textarea';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { courses } from '@/lib/data';
 import { ActionableMessage } from './actionable-message';
 
@@ -142,9 +141,29 @@ export function ChatInterface() {
           },
         ]);
       } else {
+         const newMessages: Message[] = [
+          { role: 'assistant', content: aiState.answer as string },
+        ];
+
+        const lastUserMessage = messages.length > 0 ? messages[messages.length - 1].content.toLowerCase() : '';
+        const isSpecificCourseQuery = courses.some(c => lastUserMessage.includes(c.title.toLowerCase()));
+        
+        if (isSpecificCourseQuery && aiState.answer !== "Hello! I am the university's AI admission counselor. How can I assist you today? You can ask me about courses, fees, eligibility, and more.") {
+           newMessages.push({
+            role: 'assistant',
+            content: 'You can select another course to learn more.',
+            component: 'CourseInfoSelector',
+            componentProps: {
+              courses: courses,
+              action: (course: string) => handleAction(course),
+              displayEligibility: true,
+            },
+          });
+        }
+
         setMessages((prev) => [
           ...prev,
-          { role: 'assistant', content: aiState.answer as string },
+          ...newMessages
         ]);
       }
     }
