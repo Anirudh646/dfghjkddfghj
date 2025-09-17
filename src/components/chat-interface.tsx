@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { courses } from '@/lib/data';
+import { courses, faqs } from '@/lib/data';
 import { ActionableMessage } from './actionable-message';
 import { Logo } from '@/components/logo';
 
@@ -100,6 +100,27 @@ export function ChatInterface() {
   const { toast } = useToast();
 
   const handleOptionClick = (option: string) => {
+    if (option === 'FAQ') {
+      const faqMessages: Message[] = [
+        {
+          role: 'assistant',
+          content: "Hello! I'm your AI admission counselor. Here are some frequently asked questions. Feel free to select one or ask your own question.",
+        },
+        {
+          role: 'assistant',
+          content: 'Frequently Asked Questions',
+          component: 'FaqSelector',
+          componentProps: {
+            courses: faqs.map(faq => faq.question),
+            action: (question: string) => handleAction(question),
+          }
+        }
+      ];
+      setMessages(faqMessages);
+      setShowChat(true);
+      return;
+    }
+
     setMessages([
       {
         role: 'assistant',
@@ -243,7 +264,7 @@ export function ChatInterface() {
   };
   
   if (!showChat) {
-    return <InitialOptions onOptionClick={startChat} onQuerySubmit={handleQuerySubmit} />;
+    return <InitialOptions onOptionClick={handleOptionClick} onQuerySubmit={handleQuerySubmit} />;
   }
 
 
@@ -252,7 +273,7 @@ export function ChatInterface() {
       <ScrollArea className="flex-1" ref={scrollAreaRef}>
         <div className="space-y-6 px-4 py-2">
           {messages.map((message, index) => {
-             if ((message.component === 'CourseSelector' || message.component === 'FeeTypeSelector' || message.component === 'CourseInfoSelector') && message.componentProps) {
+             if ((message.component === 'CourseSelector' || message.component === 'FeeTypeSelector' || message.component === 'CourseInfoSelector' || message.component === 'FaqSelector') && message.componentProps) {
               return (
                 <ActionableMessage key={index} message={message} {...message.componentProps} />
               )
