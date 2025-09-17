@@ -69,7 +69,7 @@ function InitialOptions({ onOptionClick, onQuerySubmit }: { onOptionClick: (opti
                 className="w-full rounded-full bg-background/80 pl-10 pr-4 py-3 text-lg"
               />
             </form>
-            <div className="flex w-full flex-col gap-4 sm:flex-row">
+            <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
               {options.map((option) => (
                 <Button
                   key={option}
