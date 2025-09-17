@@ -204,10 +204,10 @@ export function ChatInterface() {
         const lastUserMessage = messages.length > 0 ? messages[messages.length - 1].content.toLowerCase() : '';
         const isSpecificCourseQuery = courses.some(c => lastUserMessage.includes(c.title.toLowerCase()));
         
-        if (isSpecificCourseQuery && aiState.answer !== "Hello! I am the university's AI admission counselor. How can I assist you today? You can ask me about courses, fees, eligibility, and more.") {
+        if (aiState.answer !== "Hello! I am the university's AI admission counselor. How can I assist you today? You can ask me about courses, fees, eligibility, and more.") {
            newMessages.push({
             role: 'assistant',
-            content: 'What would you like to know next?',
+            content: 'Thank you for your query! What would you like to know next?',
             component: 'FeeTypeSelector', // Re-using for general options
             componentProps: {
               courses: ['Courses', 'Fees', 'Eligibility Criteria'],
