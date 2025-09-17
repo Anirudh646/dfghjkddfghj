@@ -37,6 +37,9 @@ export type GeneralInfo = {
   requiredDocuments: string[];
   applicationSteps: string[];
   fees: string;
+  busFees: {
+    [route: string]: number;
+  };
   eligibility: string;
   facilities: string;
   entranceExams: string;

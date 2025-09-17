@@ -20,7 +20,13 @@ const getContextString = (query: string) => {
     courseDetails = `The university offers a variety of undergraduate and professional programs. Key courses include: ${courses.map(c => c.title).join(', ')}. For detailed information, please ask about a specific course.`;
   }
 
-  const feesInformation = /\b(fee|cost|hostel|bus|payment|installment)\b/.test(lowerQuery) ? generalInfo.fees : undefined;
+  let feesInformation: string | undefined;
+  if (/\b(bus)\b/.test(lowerQuery)) {
+    feesInformation = `Bus fees vary by route. Here is the annual fee structure: ${Object.entries(generalInfo.busFees).map(([route, fee]) => `${route}: ₹${fee}`).join(', ')}.`;
+  } else if (/\b(fee|cost|hostel|payment|installment)\b/.test(lowerQuery)) {
+    feesInformation = generalInfo.fees;
+  }
+
   const eligibilityCriteria = /\b(eligibility|admission requirement)\b/.test(lowerQuery) ? generalInfo.eligibility : undefined;
   
   let applicationInfo: string | undefined;
