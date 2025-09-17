@@ -25,6 +25,28 @@ To run the application in your local development environment, follow these steps
     npm run genkit:watch
     ```
 
+## Publishing to GitHub
+
+To store and manage your code, you can publish your project to a GitHub repository.
+
+1.  **Create a new repository on GitHub:**
+    Go to [github.com/new](https://github.com/new) and create a new repository. You can name it whatever you like.
+
+2.  **Initialize Git in your project:**
+    Open a terminal in your project directory and run:
+    ```bash
+    git init -b main
+    git add .
+    git commit -m "Initial commit"
+    ```
+
+3.  **Link the remote repository and push:**
+    Replace `<your-username>` and `<your-repo-name>` with your GitHub username and the name of the repository you created.
+    ```bash
+    git remote add origin https://github.com/<your-username>/<your-repo-name>.git
+    git push -u origin main
+    ```
+
 ## Deployment
 
 This application is configured for deployment to various platforms that support Node.js.
