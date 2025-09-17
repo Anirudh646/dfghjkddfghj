@@ -120,6 +120,32 @@ export function ChatInterface() {
       setShowChat(true);
       return;
     }
+     if (option === 'Placement') {
+      const placementFaqs = faqs.filter(faq => 
+        faq.question.toLowerCase().includes('placement') || 
+        faq.question.toLowerCase().includes('job') ||
+        faq.question.toLowerCase().includes('salary')
+      );
+      const placementMessages: Message[] = [
+        {
+          role: 'assistant',
+          content: "I can certainly help with that. Here are some common questions about placements. Select one to learn more.",
+        },
+        {
+          role: 'assistant',
+          content: 'Placement Queries',
+          component: 'FaqSelector',
+          componentProps: {
+            courses: placementFaqs.map(faq => faq.question),
+            action: (question: string) => handleAction(question),
+          }
+        }
+      ];
+      setMessages(placementMessages);
+      setShowChat(true);
+      return;
+    }
+
 
     setMessages([
       {
@@ -336,3 +362,4 @@ export function ChatInterface() {
     
 
     
+
