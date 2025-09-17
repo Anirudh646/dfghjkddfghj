@@ -39,24 +39,8 @@ export async function answerAdmissionQuery(input: AnswerAdmissionQueryInput): Pr
     return { answer: "Hello! I am the university's AI admission counselor. How can I assist you today? You can ask me about courses, fees, eligibility, and more." };
   }
 
-  const isFeeQuery = query.includes('fee') || query.includes('cost');
-  if (isFeeQuery) {
-    if (query === 'fees' || query === 'fee') {
-      return { answer: 'ACTION_SELECT_FEE_TYPE' };
-    }
-
-    const hasCourseContext = /b\.a\.|bfa|bjmc|ba llb|b\.sc\.|b\.tech|be|bca|mbbs|bds|b\.pharm|b\.com|bba|bhm|b\.des/i.test(query);
-    const isHostelQuery = query.includes('hostel');
-    const isBusQuery = query.includes('bus');
-
-    if (hasCourseContext || isHostelQuery || isBusQuery) {
-      return answerAdmissionQueryFlow(input);
-    } else {
-      if (query.includes('course')) {
-        return { answer: 'ACTION_SELECT_COURSE_FOR_FEES' };
-      }
-      return { answer: 'ACTION_SELECT_FEE_TYPE' };
-    }
+  if (query === 'fees' || query === 'fee') {
+    return { answer: 'ACTION_SELECT_FEE_TYPE' };
   }
 
   const isCourseQuery = query.includes('course') || query.includes('program');
