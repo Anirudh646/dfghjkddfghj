@@ -36,7 +36,7 @@ function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: st
 const initialAIState: { answer?: string; error?: string } = {};
 
 function InitialOptions({ onOptionClick, onQuerySubmit }: { onOptionClick: (option: string) => void; onQuerySubmit: (query: string) => void; }) {
-  const options = ['Courses', 'Fees', 'Eligibility Criteria'];
+  const options = ['Courses', 'Fees', 'FAQ'];
   const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
