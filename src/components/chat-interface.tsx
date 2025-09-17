@@ -236,7 +236,7 @@ export function ChatInterface() {
             content: 'Thank you for your query! What would you like to know next?',
             component: 'FeeTypeSelector', // Re-using for general options
             componentProps: {
-              courses: ['Courses', 'Fees', 'Eligibility Criteria'],
+              courses: ['Courses', 'Fees', 'FAQ', 'Placement'],
               action: (option: string) => handleAction(option),
             },
           });
@@ -362,4 +362,5 @@ export function ChatInterface() {
     
 
     
+
 
