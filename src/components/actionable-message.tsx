@@ -14,9 +14,10 @@ interface ActionableMessageProps {
   courses: (Course | string)[];
   action: (course: string) => void;
   displayEligibility?: boolean;
+  displayPlacementInfo?: boolean;
 }
 
-export function ActionableMessage({ message, courses, action, displayEligibility = false }: ActionableMessageProps) {
+export function ActionableMessage({ message, courses, action, displayEligibility = false, displayPlacementInfo = false }: ActionableMessageProps) {
   return (
     <div className={cn('flex items-start gap-4 justify-start')}>
       <Avatar className="h-9 w-9 border">
@@ -33,6 +34,7 @@ export function ActionableMessage({ message, courses, action, displayEligibility
             const isCourseObject = typeof course === 'object' && course !== null;
             const title = isCourseObject ? (course as Course).title : course as string;
             const eligibility = isCourseObject ? (course as Course).eligibility : '';
+            const placementInfo = isCourseObject ? (course as Course).placementInfo : '';
 
             return (
               <Button
@@ -46,6 +48,9 @@ export function ActionableMessage({ message, courses, action, displayEligibility
                   <span>{title}</span>
                   {displayEligibility && eligibility && (
                     <span className="text-xs font-normal text-muted-foreground">{eligibility}</span>
+                  )}
+                  {displayPlacementInfo && placementInfo && (
+                     <span className="text-xs font-normal text-muted-foreground">{placementInfo}</span>
                   )}
                 </div>
               </Button>

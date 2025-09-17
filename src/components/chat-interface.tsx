@@ -121,23 +121,19 @@ export function ChatInterface() {
       return;
     }
      if (option === 'Placement') {
-      const placementFaqs = faqs.filter(faq => 
-        faq.question.toLowerCase().includes('placement') || 
-        faq.question.toLowerCase().includes('job') ||
-        faq.question.toLowerCase().includes('salary')
-      );
-      const placementMessages: Message[] = [
+        const placementMessages: Message[] = [
         {
           role: 'assistant',
-          content: "I can certainly help with that. Here are some common questions about placements. Select one to learn more.",
+          content: "I can certainly help with that. Here is a summary of placement records for our popular courses. Select one to learn more.",
         },
         {
           role: 'assistant',
-          content: 'Placement Queries',
-          component: 'FaqSelector',
+          content: 'Placement Records',
+          component: 'PlacementInfoSelector',
           componentProps: {
-            courses: placementFaqs.map(faq => faq.question),
-            action: (question: string) => handleAction(question),
+            courses: courses,
+            action: (course: string) => handleAction(`Tell me more about placements for ${course}`),
+            displayPlacementInfo: true,
           }
         }
       ];
@@ -299,7 +295,7 @@ export function ChatInterface() {
       <ScrollArea className="flex-1" ref={scrollAreaRef}>
         <div className="space-y-6 px-4 py-2">
           {messages.map((message, index) => {
-             if ((message.component === 'CourseSelector' || message.component === 'FeeTypeSelector' || message.component === 'CourseInfoSelector' || message.component === 'FaqSelector') && message.componentProps) {
+             if ((message.component === 'CourseSelector' || message.component === 'FeeTypeSelector' || message.component === 'CourseInfoSelector' || message.component === 'FaqSelector' || message.component === 'PlacementInfoSelector') && message.componentProps) {
               return (
                 <ActionableMessage key={index} message={message} {...message.componentProps} />
               )
@@ -358,9 +354,3 @@ export function ChatInterface() {
     </div>
   );
 }
-
-    
-
-    
-
-
