@@ -10,6 +10,7 @@ export type Course = {
   feeStructure?: {
     [key: string]: number;
   };
+  placementInfo?: string;
 };
 
 export type Contact = {
@@ -41,4 +42,5 @@ export type GeneralInfo = {
   entranceExams: string;
   applicationStatus: string;
   internationalAdmissions: string;
+  placements?: string;
 };

@@ -14,7 +14,8 @@ const getContextString = (query: string) => {
 
   if (mentionedCourse) {
     const feeInfo = mentionedCourse.feeStructure ? ` Fee Structure: ${JSON.stringify(mentionedCourse.feeStructure)}` : '';
-    courseDetails = `${mentionedCourse.title} (${mentionedCourse.department}) - ${mentionedCourse.description}. Duration: ${mentionedCourse.duration}. Eligibility: ${mentionedCourse.eligibility}.${feeInfo}`;
+    const placementInfo = mentionedCourse.placementInfo ? ` Placement Info: ${mentionedCourse.placementInfo}`: '';
+    courseDetails = `${mentionedCourse.title} (${mentionedCourse.department}) - ${mentionedCourse.description}. Duration: ${mentionedCourse.duration}. Eligibility: ${mentionedCourse.eligibility}.${feeInfo}.${placementInfo}`;
   } else if (/\b(course|program|curriculum|syllabus)\b/.test(lowerQuery)) {
     courseDetails = `The university offers a variety of undergraduate and professional programs. Key courses include: ${courses.map(c => c.title).join(', ')}. For detailed information, please ask about a specific course.`;
   }
@@ -30,7 +31,11 @@ const getContextString = (query: string) => {
   const scholarshipInfo = /\b(scholarship|financial aid)\b/.test(lowerQuery) ? `The university offers merit-based and need-based scholarships. Students can also apply for various government scholarships. For more details, please check the university's official website or contact the financial aid office.` : undefined;
 
   const facilitiesInformation = /\b(facilities|campus|amenities|accommodation|hostel)\b/.test(lowerQuery) ? generalInfo.facilities : undefined;
-  const contactInformation = /\b(contact|help)\b/.test(lowerQuery) ? `Key Contacts: ${contacts.map(c => `${c.name} (${c.title}) - ${c.email}`).join('; ')}. For more details, visit the contact page.` : undefined;
+  
+  let contactInformation: string | undefined;
+  if (/\b(contact|help)\b/.test(lowerQuery)) {
+      contactInformation = `Key Contacts: ${contacts.map(c => `${c.name} (${c.title}) - ${c.email}`).join('; ')}. For more details, visit the contact page.`;
+  }
   
   const faqSummaries = faqs.map(faq => {
     const questionWords = faq.question.toLowerCase().split(' ');
@@ -55,6 +60,15 @@ const getContextString = (query: string) => {
     internationalInfo = generalInfo.internationalAdmissions;
   }
 
+  let placementInfo: string | undefined;
+  if (/\b(placement|job|career|salary|recruiter)\b/.test(lowerQuery)) {
+      placementInfo = generalInfo.placements;
+  }
+
+
+  const combinedContext = [contactInformation, faqSummaries, entranceExamInfo, applicationStatusInfo, internationalInfo, placementInfo].filter(Boolean).join(' ');
+
+
   return {
     courseDetails,
     feesInformation,
@@ -62,7 +76,7 @@ const getContextString = (query: string) => {
     applicationInfo,
     scholarshipInfo,
     facilitiesInformation,
-    contactInformation: contactInformation || faqSummaries || entranceExamInfo || applicationStatusInfo || internationalInfo,
+    contactInformation: combinedContext,
   };
 };
 

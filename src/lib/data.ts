@@ -20,6 +20,7 @@ export const courses: Course[] = [
       'Semester 5': 25000,
       'Semester 6': 25000,
     },
+    placementInfo: 'Graduates can explore careers in civil services, journalism, social work, and public relations. Average starting salary is around 3-5 LPA.',
   },
   {
     id: 'bfa',
@@ -41,6 +42,7 @@ export const courses: Course[] = [
       'Semester 7': 37500,
       'Semester 8': 37500,
     },
+    placementInfo: 'Opportunities in animation, graphic design, art direction, and freelance artistry. Placements with creative agencies and media houses.',
   },
   {
     id: 'bjmc',
@@ -60,6 +62,7 @@ export const courses: Course[] = [
       'Semester 5': 45000,
       'Semester 6': 45000,
     },
+    placementInfo: 'Placements in leading news channels, newspapers, and digital media agencies. Roles include content writing, reporting, and PR.',
   },
   {
     id: 'ba-llb',
@@ -83,6 +86,7 @@ export const courses: Course[] = [
       'Semester 9': 75000,
       'Semester 10': 75000,
     },
+    placementInfo: 'Excellent placements in corporate law firms, judiciary, and as legal advisors. Average package for top graduates is 10-15 LPA.',
   },
   // Science
   {
@@ -103,6 +107,7 @@ export const courses: Course[] = [
       'Semester 5': 30000,
       'Semester 6': 30000,
     },
+    placementInfo: 'Career paths in research, healthcare, and IT. Many students opt for higher studies like M.Sc. or MCA for better prospects.',
   },
   {
     id: 'btech-be',
@@ -124,6 +129,7 @@ export const courses: Course[] = [
       'Semester 7': 90000,
       'Semester 8': 90000,
     },
+    placementInfo: 'Over 90% placement rate with top recruiters like Google, Microsoft, and Amazon. Average package for CSE is 12 LPA. Other branches average 6-8 LPA.',
   },
   {
     id: 'bca',
@@ -143,6 +149,7 @@ export const courses: Course[] = [
       'Semester 5': 42500,
       'Semester 6': 42500,
     },
+    placementInfo: 'Strong placements in the IT sector with companies like TCS, Infosys, and Wipro. Roles include software developer and system analyst. Average package: 4-6 LPA.',
   },
   {
     id: 'mbbs',
@@ -161,6 +168,7 @@ export const courses: Course[] = [
       'Year 4': 500000,
       'Year 4.5': 250000,
     },
+    placementInfo: '100% placement for internship in affiliated hospitals. Graduates can join top hospitals or start their own practice.',
   },
   {
     id: 'bds',
@@ -178,6 +186,7 @@ export const courses: Course[] = [
       'Year 3': 350000,
       'Year 4': 350000,
     },
+    placementInfo: 'Graduates can work in private or government dental clinics and hospitals. Many also open their own private practice.',
   },
   {
     id: 'bpharm',
@@ -199,6 +208,7 @@ export const courses: Course[] = [
       'Semester 7': 60000,
       'Semester 8': 60000,
     },
+    placementInfo: 'Placements in major pharmaceutical companies like Cipla and Sun Pharma. Roles in R&D, quality control, and as medical representatives.',
   },
   // Commerce / Management
   {
@@ -219,6 +229,7 @@ export const courses: Course[] = [
       'Semester 5': 27500,
       'Semester 6': 27500,
     },
+    placementInfo: 'Opportunities in banking, accounting, and finance sectors. Placements with firms like Deloitte and EY. Average salary: 4-7 LPA.',
   },
   {
     id: 'bba',
@@ -238,6 +249,7 @@ export const courses: Course[] = [
       'Semester 5': 47500,
       'Semester 6': 47500,
     },
+    placementInfo: 'Placements in marketing, sales, and HR roles across various industries. Top recruiters include HDFC Bank and Amazon. Average package: 5-8 LPA.',
   },
   // Professional Courses
   {
@@ -260,6 +272,7 @@ export const courses: Course[] = [
       'Semester 7': 65000,
       'Semester 8': 65000,
     },
+    placementInfo: 'Placements in leading hotel chains like Taj, Oberoi, and Marriott. International opportunities available. Average starting salary: 4-6 LPA.',
   },
   {
     id: 'bdes',
@@ -281,6 +294,7 @@ export const courses: Course[] = [
       'Semester 7': 80000,
       'Semester 8': 80000,
     },
+    placementInfo: 'Graduates work with top fashion brands, export houses, and as independent designers. Recruiters include Zara, H&M, and Manish Malhotra.',
   },
 ];
 
@@ -456,6 +470,32 @@ export const faqs: FaqItem[] = [
     question: 'What is the process for withdrawal or refund?',
     answer: 'The withdrawal and refund policy is governed by UGC guidelines. Please refer to the admission brochure or contact the admissions office for detailed information on the procedure and refund eligibility.',
   },
+  // Placement Queries
+  {
+    id: 'faq26',
+    question: 'What are the placement opportunities for B.Tech students?',
+    answer: 'Our B.Tech program has an excellent placement record, with over 90% of students placed in top IT and engineering companies. The average salary package for Computer Science is around 12 LPA, while other branches like Mechanical and Civil average between 6-8 LPA. Top recruiters include Google, Microsoft, Amazon, and major automotive and construction firms.',
+  },
+  {
+    id: 'faq27',
+    question: 'What kind of jobs can I get after a BBA?',
+    answer: 'BBA graduates are prepared for a variety of roles in the business world. Common career paths include marketing, sales, human resources, and financial analysis. Our placement cell has strong ties with companies like Amazon, HDFC Bank, and other leading corporations, with average starting salaries ranging from 5 to 8 LPA.',
+  },
+  {
+    id: 'faq28',
+    question: 'Are there placements for B.Sc. graduates?',
+    answer: 'While many B.Sc. graduates pursue higher education like an M.Sc. or MCA to enhance their career prospects, there are placement opportunities in IT, research labs, and pharmaceutical companies. The university provides assistance for students seeking immediate employment after their degree.',
+  },
+  {
+    id: 'faq29',
+    question: 'Do you have a dedicated placement cell?',
+    answer: 'Yes, our university has a dedicated Training and Placement Cell that works year-round to connect students with top employers. They organize workshops, mock interviews, and recruitment drives to prepare students for their careers. They are the primary point of contact for all placement-related activities.',
+  },
+  {
+    id: 'faq30',
+    question: 'What is the highest salary package offered?',
+    answer: 'The highest salary package varies each year depending on the industry and economic climate. In recent years, students from our Computer Science and Engineering department have received offers as high as 45 LPA from leading tech companies. We encourage you to get in touch with the placement cell for the latest statistics.',
+  },
 ];
 
 export const generalInfo: GeneralInfo = {
@@ -483,4 +523,5 @@ export const generalInfo: GeneralInfo = {
   entranceExams: 'Admission to professional courses like Engineering (B.Tech), Medicine (MBBS), and Law (BA LLB) is based on national-level entrance exams (JEE Main, NEET UG, CLAT respectively).',
   applicationStatus: 'You can check your application status by logging into the admission portal with the credentials provided during registration.',
   internationalAdmissions: 'Yes, we welcome international students. Please contact our international admissions office for details on the application process, visa requirements, and fees.',
+  placements: 'Our university has a dedicated Training and Placement Cell with a strong track record. We have over 90% placement rate for professional courses like B.Tech, with top recruiters like Google, Microsoft, and Amazon. Average packages vary by branch. For specific details, please ask about placement for a particular course.',
 };
