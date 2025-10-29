@@ -117,10 +117,14 @@ export function ChatInterface() {
       if (!isListening && transcript) {
         const formData = new FormData(formRef.current!);
         formData.set('query', transcript);
-        setMessages((prev) => [...prev, { role: 'user', content: transcript }]);
-        startTransition(() => {
-            formAction(formData);
-        });
+         if (messages.length === 0) {
+            startChat(transcript);
+        } else {
+            setMessages((prev) => [...prev, { role: 'user', content: transcript }]);
+            startTransition(() => {
+                formAction(formData);
+            });
+        }
         formRef.current?.reset();
       }
     }
@@ -330,15 +334,10 @@ export function ChatInterface() {
           action={(formData) => {
             const query = formData.get('query') as string;
             if (query.trim() && !isPending) {
-              
-              if (messages.length === 0) {
-                 startChat(query);
-              } else {
-                 setMessages((prev) => [...prev, { role: 'user', content: query }]);
-                startTransition(() => {
-                  formAction(formData);
-                });
-              }
+               setMessages((prev) => [...prev, { role: 'user', content: query }]);
+              startTransition(() => {
+                formAction(formData);
+              });
               formRef.current?.reset();
             }
           }}
@@ -377,3 +376,5 @@ export function ChatInterface() {
     </div>
   );
 }
+
+    
