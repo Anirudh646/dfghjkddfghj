@@ -16,7 +16,7 @@ export default function ContactPage() {
       {contacts.map((contact) => {
         const image = PlaceHolderImages.find((img) => img.id === contact.avatarId);
         return (
-          <Card key={contact.id} className="text-center">
+          <Card key={contact.id} className="text-center transition-shadow hover:shadow-lg">
             <CardHeader className="items-center">
               <Avatar className="h-24 w-24 border-4 border-primary/20">
                 {image && (
