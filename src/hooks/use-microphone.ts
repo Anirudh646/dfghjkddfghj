@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useToast } from './use-toast';
 
 // Define the shape of the SpeechRecognition event
 interface SpeechRecognitionEvent extends Event {
@@ -21,6 +22,7 @@ export function useMicrophone() {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const recognitionRef = useRef<any>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Check for browser support
@@ -45,6 +47,13 @@ export function useMicrophone() {
 
     recognition.onerror = (event: any) => {
       console.error('Speech recognition error:', event.error);
+       if (event.error === 'not-allowed') {
+        toast({
+          variant: 'destructive',
+          title: 'Microphone Access Denied',
+          description: 'Please allow microphone access in your browser settings to use this feature.',
+        });
+      }
       setIsListening(false);
     };
 
@@ -65,7 +74,7 @@ export function useMicrophone() {
     return () => {
       recognition.stop();
     };
-  }, []);
+  }, [toast]);
 
   const startListening = () => {
     if (recognitionRef.current && !isListening) {
