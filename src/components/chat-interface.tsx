@@ -3,7 +3,7 @@
 
 import React, { useActionState, useEffect, useRef, useState, useTransition } from 'react';
 import { useFormStatus } from 'react-dom';
-import { ArrowUp, LoaderCircle, Search } from 'lucide-react';
+import { ArrowUp, LoaderCircle, Mic, Search } from 'lucide-react';
 
 import { askAI } from '@/app/actions';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { courses, faqs } from '@/lib/data';
 import { ActionableMessage } from './actionable-message';
 import { Logo } from '@/components/logo';
+import { useMicrophone } from '@/hooks/use-microphone';
 
 function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: string }) {
   const { pending } = useFormStatus();
@@ -96,8 +97,35 @@ export function ChatInterface() {
   const [aiState, formAction] = useActionState(askAI, initialAIState);
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const { transcript, isListening, startListening, stopListening } = useMicrophone();
+
+  const handleVoiceInput = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
+
+  useEffect(() => {
+    if (transcript && inputRef.current) {
+      inputRef.current.value = transcript;
+      // Automatically submit the form when transcript is ready
+      if (!isListening && transcript) {
+        const formData = new FormData(formRef.current!);
+        formData.set('query', transcript);
+        setMessages((prev) => [...prev, { role: 'user', content: transcript }]);
+        startTransition(() => {
+            formAction(formData);
+        });
+        formRef.current?.reset();
+      }
+    }
+  }, [transcript, isListening]);
+
 
   const handleOptionClick = (option: string) => {
     if (option === 'FAQ') {
@@ -191,19 +219,6 @@ export function ChatInterface() {
             }
           },
         ]);
-      } else if (aiState.answer === 'ACTION_SELECT_COURSE_FOR_FEES') {
-         setMessages((prev) => [
-          ...prev,
-          { 
-            role: 'assistant', 
-            content: 'Of course! Please select a course to see the fee structure.',
-            component: 'CourseSelector',
-            componentProps: {
-              courses: courses.map(c => c.title),
-              action: (course: string) => handleAction(`What are the fees for ${course}?`),
-            }
-          },
-        ]);
       } else if (aiState.answer === 'ACTION_SELECT_COURSE_INFO') {
         setMessages((prev) => [
           ...prev,
@@ -222,9 +237,6 @@ export function ChatInterface() {
          const newMessages: Message[] = [
           { role: 'assistant', content: aiState.answer as string },
         ];
-
-        const lastUserMessage = messages.length > 0 ? messages[messages.length - 1].content.toLowerCase() : '';
-        const isSpecificCourseQuery = courses.some(c => lastUserMessage.includes(c.title.toLowerCase()));
         
         if (aiState.answer !== "Hello! I am the university's AI admission counselor. How can I assist you today? You can ask me about courses, fees, eligibility, and more.") {
            newMessages.push({
@@ -333,18 +345,29 @@ export function ChatInterface() {
           className="flex items-center gap-2"
         >
           <Input
+            ref={inputRef}
             name="query"
-            placeholder="Ask about courses, fees, eligibility..."
+            placeholder={isListening ? "Listening..." : "Ask about courses, fees, eligibility..."}
             autoComplete="off"
             className="flex-1"
             required
-            disabled={isPending}
+            disabled={isPending || isListening}
             onFocus={() => {
               if (messages.length === 0) {
                 startChat();
               }
             }}
           />
+          <Button
+            type="button"
+            size="icon"
+            variant={isListening ? 'destructive' : 'outline'}
+            onClick={handleVoiceInput}
+            disabled={isPending}
+          >
+            <Mic />
+            <span className="sr-only">{isListening ? 'Stop listening' : 'Start listening'}</span>
+          </Button>
           <Button type="submit" size="icon" disabled={isPending}>
             <ArrowUp />
             <span className="sr-only">Send message</span>
