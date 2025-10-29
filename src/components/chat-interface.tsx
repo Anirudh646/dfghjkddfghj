@@ -72,7 +72,7 @@ function InitialOptions({ onOptionClick, onQuerySubmit }: { onOptionClick: (opti
 
   return (
     <div className="flex h-full flex-col items-center justify-center p-4">
-      <div className="w-full max-w-lg text-center">
+      <div className="w-full max-w-lg text-center animate-fade-in-up">
         <Logo className="mb-8 justify-center" />
         <Card className="bg-card/80 backdrop-blur-sm">
           <CardHeader>
@@ -351,7 +351,7 @@ export function ChatInterface() {
             return <ChatMessage key={index} message={message} />;
           })}
            {isPending && (
-            <div className="flex justify-start">
+            <div className="flex justify-start animate-pulse">
               <div className="flex items-center gap-2 rounded-lg bg-muted px-4 py-3">
                 <LoaderCircle className="h-5 w-5 animate-spin text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">Thinking...</span>

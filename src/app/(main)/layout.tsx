@@ -59,7 +59,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
            <SidebarTrigger className="md:hidden" />
            <h1 className="text-lg font-semibold md:text-2xl">{navItems.find(item => item.href === pathname)?.label || 'CampusConnect AI'}</h1>
         </header>
-        <main className="flex-1 overflow-auto p-4 sm:p-6">
+        <main className="flex-1 overflow-auto p-4 sm:p-6 animate-fade-in-up">
           {children}
         </main>
       </SidebarInset>

@@ -19,7 +19,7 @@ interface ActionableMessageProps {
 
 export function ActionableMessage({ message, courses, action, displayEligibility = false, displayPlacementInfo = false }: ActionableMessageProps) {
   return (
-    <div className={cn('flex items-start gap-4 justify-start')}>
+    <div className={cn('flex items-start gap-4 justify-start animate-slide-in-bottom')}>
       <Avatar className="h-9 w-9 border">
         <AvatarFallback className="bg-primary text-primary-foreground">
           <Bot className="h-5 w-5" />

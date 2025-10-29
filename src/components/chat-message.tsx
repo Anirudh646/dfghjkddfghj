@@ -27,7 +27,7 @@ export function ChatMessage({ message }: { message: Message }) {
   return (
     <div
       className={cn(
-        'flex items-start gap-4',
+        'flex items-start gap-4 animate-slide-in-bottom',
         isUser ? 'justify-end' : 'justify-start'
       )}
     >
