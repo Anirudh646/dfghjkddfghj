@@ -39,6 +39,26 @@ const initialAIState: { answer?: string; error?: string } = {};
 function InitialOptions({ onOptionClick, onQuerySubmit }: { onOptionClick: (option: string) => void; onQuerySubmit: (query: string) => void; }) {
   const options = ['Courses', 'Fees', 'FAQ', 'Placement'];
   const formRef = useRef<HTMLFormElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const { transcript, isListening, startListening, stopListening } = useMicrophone();
+
+  const handleVoiceInput = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
+
+  useEffect(() => {
+    if (inputRef.current) {
+        inputRef.current.value = transcript;
+    }
+    if (!isListening && transcript) {
+        onQuerySubmit(transcript);
+    }
+  }, [transcript, isListening, onQuerySubmit]);
+
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -65,10 +85,22 @@ function InitialOptions({ onOptionClick, onQuerySubmit }: { onOptionClick: (opti
              <form ref={formRef} onSubmit={handleSubmit} className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
+                ref={inputRef}
                 name="query"
-                placeholder="Ask a question..."
-                className="w-full rounded-full bg-background/80 pl-10 pr-4 py-3 text-lg"
+                placeholder={isListening ? "Listening..." : "Ask a question..."}
+                className="w-full rounded-full bg-background/80 pl-10 pr-12 py-3 text-lg"
+                disabled={isListening}
               />
+              <Button
+                type="button"
+                size="icon"
+                variant={isListening ? 'destructive' : 'ghost'}
+                onClick={handleVoiceInput}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full h-8 w-8"
+              >
+                <Mic className="h-5 w-5" />
+                <span className="sr-only">{isListening ? 'Stop listening' : 'Start listening'}</span>
+              </Button>
             </form>
             <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
               {options.map((option) => (
@@ -128,7 +160,7 @@ export function ChatInterface() {
         formRef.current?.reset();
       }
     }
-  }, [transcript, isListening]);
+  }, [transcript, isListening, formAction, messages.length]);
 
 
   const handleOptionClick = (option: string) => {
@@ -376,5 +408,3 @@ export function ChatInterface() {
     </div>
   );
 }
-
-    
