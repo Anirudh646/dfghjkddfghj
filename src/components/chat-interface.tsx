@@ -36,11 +36,24 @@ function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: st
 
 const initialAIState: { answer?: string; error?: string } = {};
 
-function InitialOptions({ onOptionClick, onQuerySubmit }: { onOptionClick: (option: string) => void; onQuerySubmit: (query: string) => void; }) {
+function InitialOptions({ 
+  onOptionClick, 
+  onQuerySubmit,
+  transcript,
+  isListening,
+  startListening,
+  stopListening
+}: { 
+  onOptionClick: (option: string) => void; 
+  onQuerySubmit: (query: string) => void; 
+  transcript: string;
+  isListening: boolean;
+  startListening: () => void;
+  stopListening: () => void;
+}) {
   const options = ['Courses', 'Fees', 'FAQ', 'Placement'];
   const formRef = useRef<HTMLFormElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { transcript, isListening, startListening, stopListening } = useMicrophone();
 
   const handleVoiceInput = () => {
     if (isListening) {
@@ -56,6 +69,8 @@ function InitialOptions({ onOptionClick, onQuerySubmit }: { onOptionClick: (opti
     }
     if (!isListening && transcript) {
         onQuerySubmit(transcript);
+        if (formRef.current) formRef.current.reset();
+        if (inputRef.current) inputRef.current.value = '';
     }
   }, [transcript, isListening, onQuerySubmit]);
 
@@ -132,7 +147,7 @@ export function ChatInterface() {
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-  const { transcript, isListening, startListening, stopListening } = useMicrophone();
+  const { transcript, isListening, startListening, stopListening, setTranscript } = useMicrophone();
 
   const handleVoiceInput = () => {
     if (isListening) {
@@ -143,24 +158,30 @@ export function ChatInterface() {
   };
 
   useEffect(() => {
-    if (transcript && inputRef.current) {
-      inputRef.current.value = transcript;
-      // Automatically submit the form when transcript is ready
-      if (!isListening && transcript) {
-        const formData = new FormData(formRef.current!);
-        formData.set('query', transcript);
-         if (messages.length === 0) {
-            startChat(transcript);
-        } else {
-            setMessages((prev) => [...prev, { role: 'user', content: transcript }]);
+    if (inputRef.current) {
+        inputRef.current.value = transcript;
+    }
+    // Automatically submit the form when transcript is ready
+    if (!isListening && transcript) {
+        const query = transcript;
+        setTranscript(''); // Reset transcript after using it
+
+        if (showChat) {
+            // If chat is already visible, just add the message and submit
+            setMessages((prev) => [...prev, { role: 'user', content: query }]);
+            const formData = new FormData();
+            formData.append('query', query);
             startTransition(() => {
                 formAction(formData);
             });
+        } else {
+            // If on the initial screen, start the chat with the query
+            startChat(query);
         }
-        formRef.current?.reset();
-      }
+        if (formRef.current) formRef.current.reset();
+        if (inputRef.current) inputRef.current.value = '';
     }
-  }, [transcript, isListening, formAction, messages.length]);
+}, [transcript, isListening, formAction, showChat, setTranscript]);
 
 
   const handleOptionClick = (option: string) => {
@@ -334,7 +355,14 @@ export function ChatInterface() {
   };
   
   if (!showChat) {
-    return <InitialOptions onOptionClick={handleOptionClick} onQuerySubmit={handleQuerySubmit} />;
+    return <InitialOptions 
+      onOptionClick={handleOptionClick} 
+      onQuerySubmit={handleQuerySubmit}
+      transcript={transcript}
+      isListening={isListening}
+      startListening={startListening}
+      stopListening={stopListening}
+      />;
   }
 
 
@@ -408,3 +436,5 @@ export function ChatInterface() {
     </div>
   );
 }
+
+    

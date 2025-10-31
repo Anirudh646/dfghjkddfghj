@@ -60,13 +60,9 @@ export function useMicrophone() {
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       let finalTranscript = '';
       for (let i = event.resultIndex; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript;
-        }
+        finalTranscript += event.results[i][0].transcript;
       }
-      if (finalTranscript) {
-        setTranscript(finalTranscript);
-      }
+      setTranscript(finalTranscript);
     };
     
     recognitionRef.current = recognition;
@@ -79,15 +75,25 @@ export function useMicrophone() {
   const startListening = () => {
     if (recognitionRef.current && !isListening) {
       setTranscript(''); // Clear previous transcript
-      recognitionRef.current.start();
+      try {
+        recognitionRef.current.start();
+      } catch (e) {
+         console.error("Error starting recognition:", e);
+      }
     }
   };
 
   const stopListening = () => {
     if (recognitionRef.current && isListening) {
-      recognitionRef.current.stop();
+       try {
+        recognitionRef.current.stop();
+      } catch (e) {
+         console.error("Error stopping recognition:", e);
+      }
     }
   };
 
-  return { isListening, transcript, startListening, stopListening };
+  return { isListening, transcript, startListening, stopListening, setTranscript };
 }
+
+    
