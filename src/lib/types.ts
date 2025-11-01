@@ -47,3 +47,13 @@ export type GeneralInfo = {
   internationalAdmissions: string;
   placements?: string;
 };
+
+export type Lead = {
+  id: string;
+  name: string;
+  phone: string;
+  createdAt: {
+    seconds: number;
+    nanoseconds: number;
+  };
+};

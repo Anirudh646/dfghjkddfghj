@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpen, HelpCircle, Home, Phone } from 'lucide-react';
+import { BookOpen, HelpCircle, Home, Phone, Users } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import {
@@ -25,6 +25,7 @@ const navItems = [
   { href: '/courses', icon: BookOpen, label: 'Courses' },
   { href: '/faq', icon: HelpCircle, label: 'FAQ' },
   { href: '/contact', icon: Phone, label: 'Contact' },
+  { href: '/leads', icon: Users, label: 'Leads' },
 ];
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {

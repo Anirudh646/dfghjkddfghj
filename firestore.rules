@@ -3,11 +3,8 @@
  *
  * Core Philosophy:
  * This ruleset enforces a strict user-ownership model for contact entries
- * and allows public creation of leads while restricting read/write access.
- *
- * Data Structure:
- * - Contact entries: `/users/{userId}/contacts/{contactId}`
- * - Leads: `/leads/{leadId}`
+ * and allows public creation of leads while restricting read/write access
+ * to authenticated users.
  */
 rules_version = '2';
 service cloud.firestore {
@@ -31,11 +28,13 @@ service cloud.firestore {
      * @description Secures the leads collection.
      * @path /leads/{leadId}
      * @allow (create) for any user to capture leads.
+     * @allow (list) for authenticated users to view leads.
      * @deny (read, update, delete) to protect lead information.
      */
     match /leads/{leadId} {
       allow create: if true;
-      allow read, update, delete: if false;
+      allow list, get: if isSignedIn();
+      allow update, delete: if false;
     }
   }
 

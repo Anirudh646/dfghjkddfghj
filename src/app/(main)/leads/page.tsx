@@ -1,0 +1,183 @@
+'use client';
+
+import { useMemo } from 'react';
+import { collection, query, orderBy } from 'firebase/firestore';
+import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle, UserCheck } from 'lucide-react';
+import { format } from 'date-fns';
+import type { Lead } from '@/lib/types';
+import { useUser } from '@/firebase/provider';
+import { initiateAnonymousSignIn } from '@/firebase/non-blocking-login';
+import { useAuth } from '@/firebase';
+import { Button } from '@/components/ui/button';
+
+function formatTimestamp(timestamp: { seconds: number; nanoseconds: number }) {
+  if (!timestamp || typeof timestamp.seconds !== 'number') {
+    return 'Invalid date';
+  }
+  const date = new Date(timestamp.seconds * 1000);
+  return format(date, "MMM d, yyyy 'at' h:mm a");
+}
+
+function LeadsSkeleton() {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Name</TableHead>
+          <TableHead>Phone Number</TableHead>
+          <TableHead>Date Submitted</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {[...Array(5)].map((_, i) => (
+          <TableRow key={i}>
+            <TableCell>
+              <Skeleton className="h-5 w-32" />
+            </TableCell>
+            <TableCell>
+              <Skeleton className="h-5 w-24" />
+            </TableCell>
+            <TableCell>
+              <Skeleton className="h-5 w-40" />
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
+function PleaseSignIn() {
+  const auth = useAuth();
+  
+  const handleSignIn = () => {
+    initiateAnonymousSignIn(auth);
+  };
+
+  return (
+    <div className="flex h-full min-h-[400px] items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/50 p-8 text-center">
+      <div>
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <UserCheck className="h-8 w-8" />
+        </div>
+        <h2 className="mt-4 text-xl font-semibold tracking-tight">Access Required</h2>
+        <p className="mt-2 text-muted-foreground">
+          To view the captured leads, please sign in.
+        </p>
+        <Button onClick={handleSignIn} className="mt-6">
+          Sign In Anonymously
+        </Button>
+        <p className="mt-4 text-xs text-muted-foreground">
+          Signing in will grant you secure access to the leads data.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default function LeadsPage() {
+  const firestore = useFirestore();
+  const { user, isUserLoading } = useUser();
+
+  const leadsQuery = useMemoFirebase(
+    () =>
+      user
+        ? query(collection(firestore, 'leads'), orderBy('createdAt', 'desc'))
+        : null,
+    [firestore, user]
+  );
+
+  const {
+    data: leads,
+    isLoading: isLeadsLoading,
+    error,
+  } = useCollection<Lead>(leadsQuery);
+
+  const isLoading = isUserLoading || (user && isLeadsLoading);
+
+  if (isUserLoading) {
+     return (
+       <Card>
+        <CardHeader>
+          <CardTitle>Leads</CardTitle>
+          <CardDescription>
+            Contact information captured from the AI Counselor.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <LeadsSkeleton />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!user) {
+    return <PleaseSignIn />;
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Leads</CardTitle>
+        <CardDescription>
+          Contact information captured from the AI Counselor.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <LeadsSkeleton />
+        ) : error ? (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error Fetching Leads</AlertTitle>
+            <AlertDescription>
+              There was a problem loading the leads data. Please check the
+              security rules or try again later.
+            </AlertDescription>
+          </Alert>
+        ) : leads && leads.length > 0 ? (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Phone Number</TableHead>
+                <TableHead>Date Submitted</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {leads.map((lead) => (
+                <TableRow key={lead.id}>
+                  <TableCell className="font-medium">{lead.name}</TableCell>
+                  <TableCell>{lead.phone}</TableCell>
+                  <TableCell>{formatTimestamp(lead.createdAt)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        ) : (
+          <div className="flex h-40 items-center justify-center rounded-md border-2 border-dashed bg-muted/50">
+            <p className="text-muted-foreground">No leads captured yet.</p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
