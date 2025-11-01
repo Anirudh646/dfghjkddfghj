@@ -61,10 +61,6 @@ function SignInForm() {
     initiateEmailSignIn(auth, values.email, values.password);
   }
 
-  function onSignUp(values: z.infer<typeof formSchema>) {
-    initiateEmailSignUp(auth, values.email, values.password);
-  }
-
   return (
     <div className="flex h-full min-h-[500px] items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/50 p-8 text-center">
       <div className="w-full max-w-sm">
@@ -75,17 +71,16 @@ function SignInForm() {
           Secure Access Required
         </h2>
         <p className="mt-2 text-muted-foreground">
-          Please sign in or create an account to view leads.
+          Please sign in to view leads.
         </p>
 
-        <Tabs defaultValue="signin" className="mt-6">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="signin">Sign In</TabsTrigger>
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
-          </TabsList>
-          <Form {...form}>
-            <TabsContent value="signin">
-              <form onSubmit={form.handleSubmit(onSignIn)} className="space-y-4 text-left">
+        <Card className="mt-6 text-left">
+          <CardHeader>
+            <CardTitle>Sign In</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSignIn)} className="space-y-4">
                 <FormField
                   control={form.control}
                   name="email"
@@ -116,42 +111,9 @@ function SignInForm() {
                   Sign In
                 </Button>
               </form>
-            </TabsContent>
-            <TabsContent value="signup">
-               <form onSubmit={form.handleSubmit(onSignUp)} className="space-y-4 text-left">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input placeholder="your-email@example.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input type="password" placeholder="Choose a password" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full">
-                  Create Account
-                </Button>
-              </form>
-            </TabsContent>
-          </Form>
-        </Tabs>
+            </Form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
@@ -286,5 +248,3 @@ export default function LeadsPage() {
     </Card>
   );
 }
-
-    
