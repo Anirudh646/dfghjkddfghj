@@ -17,6 +17,7 @@ import { courses, faqs } from '@/lib/data';
 import { ActionableMessage } from './actionable-message';
 import { Logo } from '@/components/logo';
 import { useMicrophone } from '@/hooks/use-microphone';
+import { LeadCaptureForm } from './lead-capture-form';
 
 function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: string }) {
   const { pending } = useFormStatus();
@@ -148,6 +149,8 @@ export function ChatInterface() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const { transcript, isListening, startListening, stopListening, setTranscript } = useMicrophone();
+  const [leadCaptured, setLeadCaptured] = useState(false);
+  const [pendingQuery, setPendingQuery] = useState<string | null>(null);
 
   const handleVoiceInput = () => {
     if (isListening) {
@@ -167,13 +170,7 @@ export function ChatInterface() {
         setTranscript(''); // Reset transcript after using it
 
         if (showChat) {
-            // If chat is already visible, just add the message and submit
-            setMessages((prev) => [...prev, { role: 'user', content: query }]);
-            const formData = new FormData();
-            formData.append('query', query);
-            startTransition(() => {
-                formAction(formData);
-            });
+            submitQuery(query);
         } else {
             // If on the initial screen, start the chat with the query
             startChat(query);
@@ -181,8 +178,41 @@ export function ChatInterface() {
         if (formRef.current) formRef.current.reset();
         if (inputRef.current) inputRef.current.value = '';
     }
-}, [transcript, isListening, formAction, showChat, setTranscript]);
+}, [transcript, isListening, showChat, setTranscript]);
 
+const submitQuery = (query: string) => {
+    if (!query.trim() || isPending) return;
+
+    setMessages((prev) => [...prev, { role: 'user', content: query }]);
+
+    if (!leadCaptured) {
+      setPendingQuery(query);
+    } else {
+      const formData = new FormData();
+      formData.append('query', query);
+      startTransition(() => {
+        formAction(formData);
+      });
+    }
+    formRef.current?.reset();
+  };
+
+  const handleLeadCapture = (data: { name: string; phone: string }) => {
+    console.log('Lead captured:', data);
+    setLeadCaptured(true);
+    
+    // Add a confirmation message
+    setMessages(prev => [...prev, { role: 'assistant', content: `Thank you, ${data.name}! Now, let me answer your question.` }]);
+
+    if (pendingQuery) {
+      const formData = new FormData();
+      formData.append('query', pendingQuery);
+      startTransition(() => {
+        formAction(formData);
+      });
+      setPendingQuery(null);
+    }
+  };
 
   const handleOptionClick = (option: string) => {
     if (option === 'FAQ') {
@@ -197,7 +227,7 @@ export function ChatInterface() {
           component: 'FaqSelector',
           componentProps: {
             courses: faqs.map(faq => faq.question),
-            action: (question: string) => handleAction(question),
+            action: (question: string) => submitQuery(question),
           }
         }
       ];
@@ -217,7 +247,7 @@ export function ChatInterface() {
           component: 'PlacementInfoSelector',
           componentProps: {
             courses: courses,
-            action: (course: string) => handleAction(`Tell me more about placements for ${course}`),
+            action: (course: string) => submitQuery(`Tell me more about placements for ${course}`),
             displayPlacementInfo: true,
           }
         }
@@ -227,38 +257,11 @@ export function ChatInterface() {
       return;
     }
 
-
-    setMessages([
-      {
-        role: 'assistant',
-        content: "Hello! I'm your AI admission counselor. How can I help you today?",
-      },
-      {
-        role: 'user',
-        content: option
-      }
-    ]);
-
-    const formData = new FormData();
-    formData.append('query', option);
-    startTransition(() => {
-      formAction(formData);
-    });
-
-    setShowChat(true);
+    startChat(option);
   };
   
   const handleQuerySubmit = (query: string) => {
     startChat(query);
-  };
-
-  const handleAction = (query: string) => {
-    setMessages((prev) => [...prev, { role: 'user', content: query }]);
-    const formData = new FormData();
-    formData.append('query', query);
-    startTransition(() => {
-      formAction(formData);
-    });
   };
 
   useEffect(() => {
@@ -272,7 +275,7 @@ export function ChatInterface() {
             component: 'FeeTypeSelector',
             componentProps: {
               courses: ['Course Fees', 'Hostel Fees', 'Bus Fees'],
-              action: (feeType: string) => handleAction(feeType),
+              action: (feeType: string) => submitQuery(feeType),
             }
           },
         ]);
@@ -285,7 +288,7 @@ export function ChatInterface() {
             component: 'CourseInfoSelector',
             componentProps: {
               courses: courses,
-              action: (course: string) => handleAction(course),
+              action: (course: string) => submitQuery(course),
               displayEligibility: true,
             },
           },
@@ -302,7 +305,7 @@ export function ChatInterface() {
             component: 'FeeTypeSelector', // Re-using for general options
             componentProps: {
               courses: ['Courses', 'Fees', 'FAQ', 'Placement'],
-              action: (option: string) => handleAction(option),
+              action: (option: string) => submitQuery(option),
             },
           });
         }
@@ -331,7 +334,7 @@ export function ChatInterface() {
             }
         }, 100);
     }
-  }, [messages]);
+  }, [messages, pendingQuery]);
 
   const startChat = (initialQuery?: string) => {
     const greetingMessage = {
@@ -340,17 +343,12 @@ export function ChatInterface() {
     } as Message;
     
     let initialMessages = [greetingMessage];
+    setMessages(initialMessages);
 
     if (initialQuery) {
-      initialMessages.push({ role: 'user', content: initialQuery });
-      const formData = new FormData();
-      formData.append('query', initialQuery);
-      startTransition(() => {
-        formAction(formData);
-      });
+        submitQuery(initialQuery);
     }
     
-    setMessages(initialMessages);
     setShowChat(true);
   };
   
@@ -365,6 +363,7 @@ export function ChatInterface() {
       />;
   }
 
+  const showLeadForm = !leadCaptured && pendingQuery;
 
   return (
     <div className="flex h-[calc(100vh-8rem)] flex-col">
@@ -373,11 +372,27 @@ export function ChatInterface() {
           {messages.map((message, index) => {
              if ((message.component === 'CourseSelector' || message.component === 'FeeTypeSelector' || message.component === 'CourseInfoSelector' || message.component === 'FaqSelector' || message.component === 'PlacementInfoSelector') && message.componentProps) {
               return (
-                <ActionableMessage key={index} message={message} {...message.componentProps} />
+                <ActionableMessage key={index} message={message} {...message.componentProps} action={(q) => submitQuery(q)} />
               )
             }
             return <ChatMessage key={index} message={message} />;
           })}
+
+          {showLeadForm && (
+            <div className="flex justify-start animate-slide-in-bottom">
+                 <div className="flex items-start gap-4 justify-start">
+                    <Avatar className="h-9 w-9 border">
+                        <AvatarFallback className="bg-primary text-primary-foreground">
+                        <Bot className="h-5 w-5" />
+                        </AvatarFallback>
+                    </Avatar>
+                    <div className="max-w-xl rounded-lg px-4 py-3 bg-muted">
+                        <LeadCaptureForm onSubmit={handleLeadCapture} />
+                    </div>
+                </div>
+            </div>
+          )}
+
            {isPending && (
             <div className="flex justify-start animate-pulse">
               <div className="flex items-center gap-2 rounded-lg bg-muted px-4 py-3">
@@ -391,15 +406,11 @@ export function ChatInterface() {
       <div className="border-t p-4">
         <form
           ref={formRef}
-          action={(formData) => {
+          onSubmit={(e) => {
+            e.preventDefault();
+            const formData = new FormData(e.currentTarget);
             const query = formData.get('query') as string;
-            if (query.trim() && !isPending) {
-               setMessages((prev) => [...prev, { role: 'user', content: query }]);
-              startTransition(() => {
-                formAction(formData);
-              });
-              formRef.current?.reset();
-            }
+            submitQuery(query);
           }}
           className="flex items-center gap-2"
         >
@@ -410,7 +421,7 @@ export function ChatInterface() {
             autoComplete="off"
             className="flex-1"
             required
-            disabled={isPending || isListening}
+            disabled={isPending || isListening || showLeadForm}
             onFocus={() => {
               if (messages.length === 0) {
                 startChat();
@@ -422,12 +433,12 @@ export function ChatInterface() {
             size="icon"
             variant={isListening ? 'destructive' : 'outline'}
             onClick={handleVoiceInput}
-            disabled={isPending}
+            disabled={isPending || showLeadForm}
           >
             <Mic />
             <span className="sr-only">{isListening ? 'Stop listening' : 'Start listening'}</span>
           </Button>
-          <Button type="submit" size="icon" disabled={isPending}>
+          <Button type="submit" size="icon" disabled={isPending || showLeadForm}>
             <ArrowUp />
             <span className="sr-only">Send message</span>
           </Button>
@@ -436,5 +447,3 @@ export function ChatInterface() {
     </div>
   );
 }
-
-    
