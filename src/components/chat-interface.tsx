@@ -3,7 +3,7 @@
 
 import React, { useActionState, useEffect, useRef, useState, useTransition } from 'react';
 import { useFormStatus } from 'react-dom';
-import { ArrowUp, LoaderCircle, Mic, Search } from 'lucide-react';
+import { ArrowUp, Bot, LoaderCircle, Mic, Search } from 'lucide-react';
 
 import { askAI } from '@/app/actions';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,7 @@ import { ActionableMessage } from './actionable-message';
 import { Logo } from '@/components/logo';
 import { useMicrophone } from '@/hooks/use-microphone';
 import { LeadCaptureForm } from './lead-capture-form';
+import { Avatar, AvatarFallback } from './ui/avatar';
 
 function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: string }) {
   const { pending } = useFormStatus();
