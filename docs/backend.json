@@ -30,6 +30,31 @@
         "contactNumber",
         "entryDateTime"
       ]
+    },
+    "Lead": {
+      "title": "Lead",
+      "type": "object",
+      "description": "Stores lead information captured from the chat, including name, phone number, and creation timestamp.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the lead."
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number of the lead."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when the lead was created."
+        }
+      },
+      "required": [
+        "name",
+        "phone",
+        "createdAt"
+      ]
     }
   },
   "auth": {
@@ -56,6 +81,22 @@
             {
               "name": "contactId",
               "description": "The unique identifier for the contact entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/leads/{leadId}",
+        "definition": {
+          "entityName": "Lead",
+          "schema": {
+            "$ref": "#/backend/entities/Lead"
+          },
+          "description": "Stores lead information captured from the chat.",
+          "params": [
+            {
+              "name": "leadId",
+              "description": "The unique identifier for the lead entry."
             }
           ]
         }

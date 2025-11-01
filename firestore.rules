@@ -1,21 +1,13 @@
 /**
- * @fileoverview Firestore Security Rules for Contact Entries.
+ * @fileoverview Firestore Security Rules for Contact Entries and Leads.
  *
  * Core Philosophy:
- * This ruleset enforces a strict user-ownership model for contact entries.
- * Each user can only access their own contact entries.
+ * This ruleset enforces a strict user-ownership model for contact entries
+ * and allows public creation of leads while restricting read/write access.
  *
  * Data Structure:
- * All contact entries are nested under `/users/{userId}/contacts/{contactId}`.
- *
- * Key Security Decisions:
- * - Users can only manage (create, read, update, delete) contact entries that belong to them.
- * - User listing is disallowed.
- *
- * Denormalization for Authorization:
- * The contact entries are nested under the user's ID in the path, which eliminates the need
- * for `get()` calls to verify ownership. The `userId` is implicitly associated with the
- * `contactId` through the path structure.
+ * - Contact entries: `/users/{userId}/contacts/{contactId}`
+ * - Leads: `/leads/{leadId}`
  */
 rules_version = '2';
 service cloud.firestore {
@@ -24,27 +16,7 @@ service cloud.firestore {
     /**
      * @description Secures the contact entries for each user.
      * @path /users/{userId}/contacts/{contactId}
-     * @allow (create) User A creates a new contact entry under their own user ID.
-     *   - Request: { "auth": { "uid": "userA" }, "resource": { "data": { "id": "contact1", "name": "John Doe", "contactNumber": "555-1234", "entryDateTime": "2024-01-01T12:00:00Z" } } }
-     * @allow (get) User A retrieves a contact entry under their own user ID.
-     *   - Request: { "auth": { "uid": "userA" } }
-     * @allow (update) User A updates a contact entry under their own user ID.
-     *   - Request: { "auth": { "uid": "userA" }, "resource": { "data": { "id": "contact1", "name": "Jane Doe", "contactNumber": "555-4321", "entryDateTime": "2024-01-01T12:00:00Z" } } }
-     * @allow (delete) User A deletes a contact entry under their own user ID.
-     *   - Request: { "auth": { "uid": "userA" } }
-     * @allow (list) User A lists contact entries under their own user ID.
-     *   - Request: { "auth": { "uid": "userA" } }
-     * @deny (create) User A tries to create a contact entry under User B's ID.
-     *   - Request: { "auth": { "uid": "userA" }, "resource": { "data": { "id": "contact1", "name": "John Doe", "contactNumber": "555-1234", "entryDateTime": "2024-01-01T12:00:00Z" } } }
-     * @deny (get) User A tries to retrieve a contact entry under User B's ID.
-     *   - Request: { "auth": { "uid": "userA" } }
-     * @deny (update) User A tries to update a contact entry under User B's ID.
-     *   - Request: { "auth": { "uid": "userA" }, "resource": { "data": { "id": "contact1", "name": "Jane Doe", "contactNumber": "555-4321", "entryDateTime": "2024-01-01T12:00:00Z" } } }
-     * @deny (delete) User A tries to delete a contact entry under User B's ID.
-     *   - Request: { "auth": { "uid": "userA" } }
-     * @deny (list) User A tries to list contact entries under User B's ID.
-     *   - Request: { "auth": { "uid": "userA" } }
-     * @principle Enforces document ownership for all CRUD operations.
+     * @allow (create, get, update, delete, list) only for the user who owns the data.
      */
     match /users/{userId}/contacts/{contactId} {
       allow get: if isSignedIn() && isOwner(userId);
@@ -53,6 +25,17 @@ service cloud.firestore {
       allow create: if isSignedIn() && isOwner(userId) && request.resource.data.id == contactId;
       allow update: if isSignedIn() && isExistingOwner(userId) && request.resource.data.id == resource.data.id;
       allow delete: if isSignedIn() && isExistingOwner(userId);
+    }
+
+    /**
+     * @description Secures the leads collection.
+     * @path /leads/{leadId}
+     * @allow (create) for any user to capture leads.
+     * @deny (read, update, delete) to protect lead information.
+     */
+    match /leads/{leadId} {
+      allow create: if true;
+      allow read, update, delete: if false;
     }
   }
 

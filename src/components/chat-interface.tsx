@@ -18,7 +18,10 @@ import { ActionableMessage } from './actionable-message';
 import { Logo } from '@/components/logo';
 import { useMicrophone } from '@/hooks/use-microphone';
 import { LeadCaptureForm } from './lead-capture-form';
-import { Avatar, AvatarFallback } from './ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { saveLead } from '@/firebase/leads';
+import { useFirestore } from '@/firebase';
+
 
 function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: string }) {
   const { pending } = useFormStatus();
@@ -152,6 +155,7 @@ export function ChatInterface() {
   const { transcript, isListening, startListening, stopListening, setTranscript } = useMicrophone();
   const [leadCaptured, setLeadCaptured] = useState(false);
   const [pendingQuery, setPendingQuery] = useState<string | null>(null);
+  const firestore = useFirestore();
 
   const handleVoiceInput = () => {
     if (isListening) {
@@ -199,7 +203,7 @@ const submitQuery = (query: string) => {
   };
 
   const handleLeadCapture = (data: { name: string; phone: string }) => {
-    console.log('Lead captured:', data);
+    saveLead(firestore, data);
     setLeadCaptured(true);
     
     // Add a confirmation message
