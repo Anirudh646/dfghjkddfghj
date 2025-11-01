@@ -24,10 +24,7 @@ import { AlertCircle, UserCheck } from 'lucide-react';
 import { format } from 'date-fns';
 import type { Lead } from '@/lib/types';
 import { useUser } from '@/firebase/provider';
-import {
-  initiateEmailSignIn,
-  initiateEmailSignUp,
-} from '@/firebase/non-blocking-login';
+import { initiateEmailSignIn } from '@/firebase/non-blocking-login';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -41,7 +38,8 @@ import { Input } from '@/components/ui/input';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
@@ -52,13 +50,26 @@ const formSchema = z.object({
 
 function SignInForm() {
   const auth = useAuth();
+  const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { email: '', password: '' },
   });
-  
-  function onSignIn(values: z.infer<typeof formSchema>) {
-    initiateEmailSignIn(auth, values.email, values.password);
+
+  async function onSignIn(values: z.infer<typeof formSchema>) {
+    try {
+      await signInWithEmailAndPassword(auth, values.email, values.password);
+    } catch (error: any) {
+      console.error('Sign-in failed:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Sign-In Failed',
+        description:
+          error.code === 'auth/invalid-credential'
+            ? 'Incorrect email or password. Please try again.'
+            : error.message || 'An unexpected error occurred.',
+      });
+    }
   }
 
   return (
@@ -80,7 +91,10 @@ function SignInForm() {
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSignIn)} className="space-y-4">
+              <form
+                onSubmit={form.handleSubmit(onSignIn)}
+                className="space-y-4"
+              >
                 <FormField
                   control={form.control}
                   name="email"
@@ -101,7 +115,11 @@ function SignInForm() {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -214,10 +232,9 @@ export default function LeadsPage() {
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Error Fetching Leads</AlertTitle>
             <AlertDescription>
-              {error.message.includes('permission-denied') 
-                ? "You do not have permission to view this data. Please check Firestore security rules."
-                : "There was a problem loading the leads data. Please try again later."
-              }
+              {error.message.includes('permission-denied')
+                ? 'You do not have permission to view this data. Please check Firestore security rules.'
+                : 'There was a problem loading the leads data. Please try again later.'}
             </AlertDescription>
           </Alert>
         ) : leads && leads.length > 0 ? (
