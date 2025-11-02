@@ -202,12 +202,16 @@ const submitQuery = (query: string) => {
     formRef.current?.reset();
   };
 
-  const handleLeadCapture = (data: { name: string; phone: string; email: string }) => {
+  const handleLeadCapture = (data: { name: string; phone: string; }) => {
     saveLead(firestore, data);
     setLeadCaptured(true);
     
-    // Add a confirmation message
-    setMessages(prev => [...prev, { role: 'assistant', content: `Thank you, ${data.name}! Now, let me answer your question.` }]);
+    // Add confirmation messages
+    setMessages(prev => [
+      ...prev, 
+      { role: 'assistant', content: `Thank you, ${data.name}! Now, let me answer your question.` },
+      { role: 'assistant', content: "Your name and contact number will be used only to reach you regarding this service. We respect your privacy." }
+    ]);
 
     if (pendingQuery) {
       const formData = new FormData();
