@@ -37,7 +37,6 @@ import { Input } from '@/components/ui/input';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useToast } from '@/hooks/use-toast';
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 
 const formSchema = z.object({
@@ -49,7 +48,6 @@ const formSchema = z.object({
 
 function SignInForm() {
   const auth = useAuth();
-  const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { email: '', password: '' },
@@ -61,15 +59,14 @@ function SignInForm() {
     } catch (error: any) {
       console.error('Sign-in failed:', error);
       if (error.code === 'auth/invalid-credential') {
-        toast({
-          variant: 'destructive',
-          description: 'Incorrect email or password.',
+        form.setError('password', {
+          type: 'manual',
+          message: 'Incorrect email or password.',
         });
       } else {
-        toast({
-          variant: 'destructive',
-          title: 'Sign-In Failed',
-          description: 'An unexpected error occurred. Please try again.',
+        form.setError('root.serverError', {
+          type: 'manual',
+          message: 'An unexpected error occurred. Please try again.',
         });
       }
     }
@@ -128,8 +125,13 @@ function SignInForm() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
-                  Sign In
+                {form.formState.errors.root?.serverError && (
+                  <FormMessage className="text-destructive">
+                    {form.formState.errors.root.serverError.message}
+                  </FormMessage>
+                )}
+                <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting ? 'Signing In...' : 'Sign In'}
                 </Button>
               </form>
             </Form>
@@ -199,8 +201,6 @@ export default function LeadsPage() {
   const isLoading = isUserLoading || (user && isLeadsLoading);
 
   useEffect(() => {
-    // When the component unmounts, sign the user out.
-    // This ensures they have to log in again next time they visit.
     return () => {
       if (auth.currentUser) {
         signOut(auth);
@@ -233,10 +233,15 @@ export default function LeadsPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Leads</CardTitle>
-        <CardDescription>
-          Contact information captured from the AI Counselor.
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Leads</CardTitle>
+            <CardDescription>
+              Contact information captured from the AI Counselor.
+            </CardDescription>
+          </div>
+          <Button variant="outline" onClick={() => signOut(auth)}>Sign Out</Button>
+        </div>
       </CardHeader>
       <CardContent>
         {isLoading ? (
