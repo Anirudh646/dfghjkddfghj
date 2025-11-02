@@ -222,14 +222,14 @@ export default function LeadsPage() {
   const isLoading = isUserLoading || (user && isLeadsLoading);
 
   useEffect(() => {
-    return () => {
-      if (auth.currentUser) {
-        signOut(auth);
-      }
-    };
-  }, [auth]);
-  
+    // When the user logs out, clear the selected leads
+    if (!user) {
+      setSelectedLeads([]);
+    }
+  }, [user]);
+
   useEffect(() => {
+    // When the leads data changes (e.g., after deletion), clear selections
     setSelectedLeads([]);
   }, [leads]);
 
@@ -414,3 +414,5 @@ export default function LeadsPage() {
     </>
   );
 }
+
+    
