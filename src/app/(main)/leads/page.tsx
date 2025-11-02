@@ -36,7 +36,7 @@ import { AlertCircle, Trash2, UserCheck } from 'lucide-react';
 import { format } from 'date-fns';
 import type { Lead } from '@/lib/types';
 import { useUser, useAuth } from '@/firebase/provider';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -413,5 +413,3 @@ export default function LeadsPage() {
     </>
   );
 }
-
-    
