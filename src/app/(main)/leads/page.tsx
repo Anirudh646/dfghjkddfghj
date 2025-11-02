@@ -32,7 +32,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, Trash2, UserCheck, Mail } from 'lucide-react';
+import { AlertCircle, Trash2, UserCheck } from 'lucide-react';
 import { format } from 'date-fns';
 import type { Lead } from '@/lib/types';
 import { useUser, useAuth } from '@/firebase/provider';
@@ -168,7 +168,6 @@ function LeadsSkeleton() {
         <TableRow>
           <TableHead className="w-[40px]"><Checkbox disabled /></TableHead>
           <TableHead>Name</TableHead>
-          <TableHead>Email</TableHead>
           <TableHead>Phone Number</TableHead>
           <TableHead>Date Submitted</TableHead>
           <TableHead className="text-right">Actions</TableHead>
@@ -189,9 +188,6 @@ function LeadsSkeleton() {
             </TableCell>
             <TableCell>
               <Skeleton className="h-5 w-40" />
-            </TableCell>
-            <TableCell className="text-right">
-              <Skeleton className="h-8 w-8" />
             </TableCell>
           </TableRow>
         ))}
@@ -279,12 +275,6 @@ export default function LeadsPage() {
     }
   };
 
-  const mailtoLink = useMemo(() => {
-    if (!leads || leads.length === 0) return '#';
-    const emails = leads.map(lead => lead.email).join(',');
-    return `mailto:${emails}`;
-  }, [leads]);
-
   const numSelected = selectedLeads.length;
   const rowCount = leads?.length ?? 0;
 
@@ -343,12 +333,6 @@ export default function LeadsPage() {
               </CardDescription>
             </div>
              <div className="flex items-center gap-2">
-              {leads && leads.length > 0 && (
-                 <a href={mailtoLink} className={buttonVariants({ variant: 'outline', size: 'sm'})}>
-                  <Mail className="mr-2 h-4 w-4" />
-                  Mail All
-                </a>
-              )}
               {numSelected > 0 && (
                 <Button variant="destructive" size="sm" onClick={() => openConfirmation()}>
                   <Trash2 className="mr-2 h-4 w-4" />
@@ -387,7 +371,6 @@ export default function LeadsPage() {
                       />
                     </TableHead>
                     <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
                     <TableHead>Phone Number</TableHead>
                     <TableHead>Date Submitted</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -404,7 +387,6 @@ export default function LeadsPage() {
                         />
                       </TableCell>
                       <TableCell className="font-medium">{lead.name}</TableCell>
-                      <TableCell>{lead.email}</TableCell>
                       <TableCell>{lead.phone}</TableCell>
                       <TableCell>{formatTimestamp(lead.createdAt)}</TableCell>
                       <TableCell className="text-right">

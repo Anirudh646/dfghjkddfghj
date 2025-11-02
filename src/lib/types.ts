@@ -1,3 +1,4 @@
+
 export type Course = {
   id: string;
   title: string;
@@ -52,7 +53,6 @@ export type Lead = {
   id: string;
   name: string;
   phone: string;
-  email: string;
   createdAt: {
     seconds: number;
     nanoseconds: number;

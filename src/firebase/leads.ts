@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -10,7 +11,6 @@ import { addDocumentNonBlocking } from './non-blocking-updates';
 interface LeadData {
   name: string;
   phone: string;
-  email: string;
 }
 
 /**
