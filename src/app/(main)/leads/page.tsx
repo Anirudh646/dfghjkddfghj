@@ -57,7 +57,6 @@ function SignInForm() {
     try {
       await signInWithEmailAndPassword(auth, values.email, values.password);
     } catch (error: any) {
-      console.error('Sign-in failed:', error);
       if (error.code === 'auth/invalid-credential') {
         form.setError('password', {
           type: 'manual',
