@@ -60,14 +60,18 @@ function SignInForm() {
       await signInWithEmailAndPassword(auth, values.email, values.password);
     } catch (error: any) {
       console.error('Sign-in failed:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Sign-In Failed',
-        description:
-          error.code === 'auth/invalid-credential'
-            ? 'Incorrect email or password. Please try again.'
-            : error.message || 'An unexpected error occurred.',
-      });
+      if (error.code === 'auth/invalid-credential') {
+        toast({
+          variant: 'destructive',
+          description: 'Incorrect email or password.',
+        });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Sign-In Failed',
+          description: 'An unexpected error occurred. Please try again.',
+        });
+      }
     }
   }
 
