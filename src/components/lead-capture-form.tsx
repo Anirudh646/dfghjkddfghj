@@ -89,6 +89,9 @@ export function LeadCaptureForm({ onSubmit }: LeadCaptureFormProps) {
             </Button>
           </form>
         </Form>
+        <p className="pt-2 text-center text-xs text-muted-foreground">
+          Your name and contact number will be used only to reach you regarding this service. We respect your privacy.
+        </p>
       </CardContent>
     </Card>
   );
