@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { useFirestore, useCollection, useMemoFirebase, useAuth } from '@/firebase';
 import {
@@ -24,7 +24,6 @@ import { AlertCircle, UserCheck } from 'lucide-react';
 import { format } from 'date-fns';
 import type { Lead } from '@/lib/types';
 import { useUser } from '@/firebase/provider';
-import { initiateEmailSignIn } from '@/firebase/non-blocking-login';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -39,7 +38,7 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useToast } from '@/hooks/use-toast';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
@@ -176,6 +175,7 @@ function LeadsSkeleton() {
 
 export default function LeadsPage() {
   const firestore = useFirestore();
+  const auth = useAuth();
   const { user, isUserLoading, userError } = useUser();
 
   const leadsQuery = useMemoFirebase(
@@ -193,6 +193,16 @@ export default function LeadsPage() {
   } = useCollection<Lead>(leadsQuery);
 
   const isLoading = isUserLoading || (user && isLeadsLoading);
+
+  useEffect(() => {
+    // When the component unmounts, sign the user out.
+    // This ensures they have to log in again next time they visit.
+    return () => {
+      if (auth.currentUser) {
+        signOut(auth);
+      }
+    };
+  }, [auth]);
 
   if (isUserLoading) {
     return (
