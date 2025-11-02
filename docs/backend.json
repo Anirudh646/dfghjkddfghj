@@ -44,6 +44,10 @@
           "type": "string",
           "description": "Phone number of the lead."
         },
+        "email": {
+            "type": "string",
+            "description": "Email address of the lead."
+        },
         "createdAt": {
           "type": "string",
           "format": "date-time",
@@ -53,6 +57,7 @@
       "required": [
         "name",
         "phone",
+        "email",
         "createdAt"
       ]
     }
@@ -104,5 +109,3 @@
     "reasoning": "The Firestore structure is designed to store contact entries with a focus on individual user ownership. Each user has a dedicated collection of contact entries, ensuring data isolation and simplified security rules. The `contacts/{contactId}` collection is used to store the actual contact entry data, including the name, contact number, and date/time the information was recorded.  This design achieves Authorization Independence by storing each contact entry within a user-specific collection. Since access control is based on path ownership (`/users/{userId}/contacts/{contactId}`), security rules can be enforced without relying on `get()` calls to parent documents.  This structure facilitates simple, robust, and easily debuggable security rules, aligning with the principle of Authorization Independence. The structure inherently supports QAPs, as `list` operations are naturally scoped to the individual user's collection, ensuring only authorized contact entries are returned."
   }
 }
-
-    

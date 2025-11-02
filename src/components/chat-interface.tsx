@@ -202,7 +202,7 @@ const submitQuery = (query: string) => {
     formRef.current?.reset();
   };
 
-  const handleLeadCapture = (data: { name: string; phone: string }) => {
+  const handleLeadCapture = (data: { name: string; phone: string; email: string }) => {
     saveLead(firestore, data);
     setLeadCaptured(true);
     

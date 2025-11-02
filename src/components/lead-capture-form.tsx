@@ -21,6 +21,7 @@ const leadCaptureSchema = z.object({
   name: z.string().min(2, {
     message: 'Name must be at least 2 characters.',
   }),
+  email: z.string().email({ message: 'Please enter a valid email.' }),
   phone: z.string().regex(/^[0-9]{10}$/, {
     message: 'Please enter a valid 10-digit phone number.',
   }),
@@ -38,6 +39,7 @@ export function LeadCaptureForm({ onSubmit }: LeadCaptureFormProps) {
     resolver: zodResolver(leadCaptureSchema),
     defaultValues: {
       name: '',
+      email: '',
       phone: '',
     },
   });
@@ -52,7 +54,7 @@ export function LeadCaptureForm({ onSubmit }: LeadCaptureFormProps) {
       <CardHeader className='p-0 pb-4'>
         <CardTitle className="text-lg">Just one moment...</CardTitle>
         <CardDescription>
-          To provide you with the best assistance, could you please share your name and contact number?
+          To provide you with the best assistance, could you please share your contact details?
         </CardDescription>
       </CardHeader>
       <CardContent className='p-0'>
@@ -66,6 +68,19 @@ export function LeadCaptureForm({ onSubmit }: LeadCaptureFormProps) {
                   <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input placeholder="e.g., Jane Doe" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., jane.doe@example.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
