@@ -1,7 +1,8 @@
+
 'use client';
 
 import { useMemo, useState, useEffect } from 'react';
-import { collection, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
+import { collection, query, orderBy, doc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import {
   AlertDialog,
@@ -28,6 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle, Trash2, UserCheck } from 'lucide-react';
@@ -164,6 +166,7 @@ function LeadsSkeleton() {
     <Table>
       <TableHeader>
         <TableRow>
+          <TableHead className="w-[40px]"><Checkbox disabled /></TableHead>
           <TableHead>Name</TableHead>
           <TableHead>Phone Number</TableHead>
           <TableHead>Date Submitted</TableHead>
@@ -173,6 +176,7 @@ function LeadsSkeleton() {
       <TableBody>
         {[...Array(5)].map((_, i) => (
           <TableRow key={i}>
+            <TableCell><Checkbox disabled /></TableCell>
             <TableCell>
               <Skeleton className="h-5 w-32" />
             </TableCell>
@@ -197,6 +201,9 @@ export default function LeadsPage() {
   const auth = useAuth();
   const { user, isUserLoading, userError } = useUser();
   const [leadToDelete, setLeadToDelete] = useState<Lead | null>(null);
+  const [selectedLeads, setSelectedLeads] = useState<string[]>([]);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
 
   const leadsQuery = useMemoFirebase(
     () =>
@@ -221,17 +228,55 @@ export default function LeadsPage() {
       }
     };
   }, [auth]);
+  
+  useEffect(() => {
+    setSelectedLeads([]);
+  }, [leads]);
 
-  const handleDelete = async () => {
-    if (!leadToDelete) return;
-    const leadRef = doc(firestore, 'leads', leadToDelete.id);
+  const handleDeleteConfirm = async () => {
+    const batch = writeBatch(firestore);
+    const leadsToDelete = leadToDelete ? [leadToDelete.id] : selectedLeads;
+
+    leadsToDelete.forEach(id => {
+        const leadRef = doc(firestore, 'leads', id);
+        batch.delete(leadRef);
+    });
+
     try {
-      await deleteDoc(leadRef);
-      setLeadToDelete(null);
+        await batch.commit();
     } catch (error) {
-      console.error('Error deleting lead:', error);
+        console.error('Error deleting lead(s):', error);
+    } finally {
+        setIsConfirmOpen(false);
+        setLeadToDelete(null);
+        setSelectedLeads([]);
     }
   };
+
+  const openConfirmation = (lead: Lead | null = null) => {
+    setLeadToDelete(lead);
+    setIsConfirmOpen(true);
+  }
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked && leads) {
+      setSelectedLeads(leads.map(lead => lead.id));
+    } else {
+      setSelectedLeads([]);
+    }
+  };
+
+  const handleSelectRow = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedLeads(prev => [...prev, id]);
+    } else {
+      setSelectedLeads(prev => prev.filter(leadId => leadId !== id));
+    }
+  };
+
+  const numSelected = selectedLeads.length;
+  const rowCount = leads?.length ?? 0;
+
 
   if (isUserLoading) {
     return (
@@ -258,20 +303,21 @@ export default function LeadsPage() {
   return (
     <>
       <AlertDialog
-        open={!!leadToDelete}
-        onOpenChange={(open) => !open && setLeadToDelete(null)}
+        open={isConfirmOpen}
+        onOpenChange={setIsConfirmOpen}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the lead
-              for <span className="font-semibold">{leadToDelete?.name}</span>.
+              This action cannot be undone. This will permanently delete {leadToDelete ? `the lead for ${leadToDelete.name}` : `${numSelected} lead(s)`}.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+            <AlertDialogAction onClick={handleDeleteConfirm} className={buttonVariants({ variant: 'destructive' })}>
+              Delete
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -285,9 +331,17 @@ export default function LeadsPage() {
                 Contact information captured from the AI Counselor.
               </CardDescription>
             </div>
-            <Button variant="outline" onClick={() => signOut(auth)}>
-              Sign Out
-            </Button>
+             <div className="flex items-center gap-2">
+              {numSelected > 0 && (
+                <Button variant="destructive" size="sm" onClick={() => openConfirmation()}>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete ({numSelected})
+                </Button>
+              )}
+              <Button variant="outline" onClick={() => signOut(auth)}>
+                Sign Out
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -304,34 +358,51 @@ export default function LeadsPage() {
               </AlertDescription>
             </Alert>
           ) : leads && leads.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Phone Number</TableHead>
-                  <TableHead>Date Submitted</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {leads.map((lead) => (
-                  <TableRow key={lead.id}>
-                    <TableCell className="font-medium">{lead.name}</TableCell>
-                    <TableCell>{lead.phone}</TableCell>
-                    <TableCell>{formatTimestamp(lead.createdAt)}</TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setLeadToDelete(lead)}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[40px]">
+                      <Checkbox
+                        checked={rowCount > 0 && numSelected === rowCount}
+                        onCheckedChange={handleSelectAll}
+                        aria-label="Select all"
+                      />
+                    </TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Phone Number</TableHead>
+                    <TableHead>Date Submitted</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {leads.map((lead) => (
+                    <TableRow key={lead.id} data-state={selectedLeads.includes(lead.id) && "selected"}>
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedLeads.includes(lead.id)}
+                          onCheckedChange={(checked) => handleSelectRow(lead.id, !!checked)}
+                          aria-label={`Select lead ${lead.name}`}
+                        />
+                      </TableCell>
+                      <TableCell className="font-medium">{lead.name}</TableCell>
+                      <TableCell>{lead.phone}</TableCell>
+                      <TableCell>{formatTimestamp(lead.createdAt)}</TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => openConfirmation(lead)}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                          <span className="sr-only">Delete lead</span>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           ) : (
             <div className="flex h-40 items-center justify-center rounded-md border-2 border-dashed bg-muted/50">
               <p className="text-muted-foreground">No leads captured yet.</p>
@@ -342,3 +413,5 @@ export default function LeadsPage() {
     </>
   );
 }
+
+    
