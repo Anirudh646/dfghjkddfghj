@@ -168,7 +168,6 @@ function LeadsSkeleton() {
         <TableRow>
           <TableHead className="w-[40px]"><Checkbox disabled /></TableHead>
           <TableHead>Name</TableHead>
-          <TableHead>Email</TableHead>
           <TableHead>Phone Number</TableHead>
           <TableHead>Date Submitted</TableHead>
           <TableHead className="text-right">Actions</TableHead>
@@ -180,9 +179,6 @@ function LeadsSkeleton() {
             <TableCell><Checkbox disabled /></TableCell>
             <TableCell>
               <Skeleton className="h-5 w-32" />
-            </TableCell>
-            <TableCell>
-              <Skeleton className="h-5 w-40" />
             </TableCell>
             <TableCell>
               <Skeleton className="h-5 w-24" />
@@ -278,13 +274,6 @@ export default function LeadsPage() {
       setSelectedLeads(prev => prev.filter(leadId => leadId !== id));
     }
   };
-  
-  const handleMailAll = () => {
-    if (leads && leads.length > 0) {
-        const emails = leads.map(lead => lead.email).join(',');
-        window.location.href = `mailto:${emails}`;
-    }
-  };
 
   const numSelected = selectedLeads.length;
   const rowCount = leads?.length ?? 0;
@@ -350,12 +339,6 @@ export default function LeadsPage() {
                   Delete ({numSelected})
                 </Button>
               )}
-               {leads && leads.length > 0 && (
-                <Button variant="outline" size="sm" onClick={handleMailAll}>
-                    <Mail className="mr-2 h-4 w-4" />
-                    Mail All
-                </Button>
-               )}
               <Button variant="outline" onClick={() => signOut(auth)}>
                 Sign Out
               </Button>
@@ -388,7 +371,6 @@ export default function LeadsPage() {
                       />
                     </TableHead>
                     <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
                     <TableHead>Phone Number</TableHead>
                     <TableHead>Date Submitted</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -405,7 +387,6 @@ export default function LeadsPage() {
                         />
                       </TableCell>
                       <TableCell className="font-medium">{lead.name}</TableCell>
-                      <TableCell>{lead.email}</TableCell>
                       <TableCell>{lead.phone}</TableCell>
                       <TableCell>{formatTimestamp(lead.createdAt)}</TableCell>
                       <TableCell className="text-right">
