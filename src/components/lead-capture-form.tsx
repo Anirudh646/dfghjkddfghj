@@ -87,9 +87,6 @@ export function LeadCaptureForm({ onSubmit }: LeadCaptureFormProps) {
             <Button type="submit" disabled={isSubmitting} className="w-full">
               {isSubmitting ? 'Please wait...' : 'Continue'}
             </Button>
-             <p className="text-xs text-muted-foreground pt-2 text-center">
-              Your name and contact number will be used only to reach you regarding this service. We respect your privacy.
-            </p>
           </form>
         </Form>
       </CardContent>
