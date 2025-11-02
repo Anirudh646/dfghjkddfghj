@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect } from 'react';
 import { collection, query, orderBy } from 'firebase/firestore';
-import { useFirestore, useCollection, useMemoFirebase, useAuth } from '@/firebase';
+import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import {
   Card,
   CardContent,
@@ -23,7 +23,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle, UserCheck } from 'lucide-react';
 import { format } from 'date-fns';
 import type { Lead } from '@/lib/types';
-import { useUser } from '@/firebase/provider';
+import { useUser, useAuth } from '@/firebase/provider';
 import { Button } from '@/components/ui/button';
 import {
   Form,
