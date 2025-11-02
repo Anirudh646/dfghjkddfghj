@@ -1,8 +1,18 @@
 'use client';
 
 import { useMemo, useState, useEffect } from 'react';
-import { collection, query, orderBy } from 'firebase/firestore';
+import { collection, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import {
   Card,
   CardContent,
@@ -20,7 +30,7 @@ import {
 } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, UserCheck } from 'lucide-react';
+import { AlertCircle, Trash2, UserCheck } from 'lucide-react';
 import { format } from 'date-fns';
 import type { Lead } from '@/lib/types';
 import { useUser, useAuth } from '@/firebase/provider';
@@ -157,6 +167,7 @@ function LeadsSkeleton() {
           <TableHead>Name</TableHead>
           <TableHead>Phone Number</TableHead>
           <TableHead>Date Submitted</TableHead>
+          <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -171,6 +182,9 @@ function LeadsSkeleton() {
             <TableCell>
               <Skeleton className="h-5 w-40" />
             </TableCell>
+            <TableCell className="text-right">
+              <Skeleton className="h-8 w-8" />
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -182,6 +196,7 @@ export default function LeadsPage() {
   const firestore = useFirestore();
   const auth = useAuth();
   const { user, isUserLoading, userError } = useUser();
+  const [leadToDelete, setLeadToDelete] = useState<Lead | null>(null);
 
   const leadsQuery = useMemoFirebase(
     () =>
@@ -207,6 +222,17 @@ export default function LeadsPage() {
     };
   }, [auth]);
 
+  const handleDelete = async () => {
+    if (!leadToDelete) return;
+    const leadRef = doc(firestore, 'leads', leadToDelete.id);
+    try {
+      await deleteDoc(leadRef);
+      setLeadToDelete(null);
+    } catch (error) {
+      console.error('Error deleting lead:', error);
+    }
+  };
+
   if (isUserLoading) {
     return (
       <Card>
@@ -230,56 +256,89 @@ export default function LeadsPage() {
   const error = userError || leadsError;
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>Leads</CardTitle>
-            <CardDescription>
-              Contact information captured from the AI Counselor.
-            </CardDescription>
+    <>
+      <AlertDialog
+        open={!!leadToDelete}
+        onOpenChange={(open) => !open && setLeadToDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the lead
+              for <span className="font-semibold">{leadToDelete?.name}</span>.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Leads</CardTitle>
+              <CardDescription>
+                Contact information captured from the AI Counselor.
+              </CardDescription>
+            </div>
+            <Button variant="outline" onClick={() => signOut(auth)}>
+              Sign Out
+            </Button>
           </div>
-          <Button variant="outline" onClick={() => signOut(auth)}>Sign Out</Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {isLoading ? (
-          <LeadsSkeleton />
-        ) : error ? (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error Fetching Leads</AlertTitle>
-            <AlertDescription>
-              {error.message.includes('permission-denied')
-                ? 'You do not have permission to view this data. Please check Firestore security rules.'
-                : 'There was a problem loading the leads data. Please try again later.'}
-            </AlertDescription>
-          </Alert>
-        ) : leads && leads.length > 0 ? (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Phone Number</TableHead>
-                <TableHead>Date Submitted</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {leads.map((lead) => (
-                <TableRow key={lead.id}>
-                  <TableCell className="font-medium">{lead.name}</TableCell>
-                  <TableCell>{lead.phone}</TableCell>
-                  <TableCell>{formatTimestamp(lead.createdAt)}</TableCell>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <LeadsSkeleton />
+          ) : error ? (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error Fetching Leads</AlertTitle>
+              <AlertDescription>
+                {error.message.includes('permission-denied')
+                  ? 'You do not have permission to view this data. Please check Firestore security rules.'
+                  : 'There was a problem loading the leads data. Please try again later.'}
+              </AlertDescription>
+            </Alert>
+          ) : leads && leads.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Phone Number</TableHead>
+                  <TableHead>Date Submitted</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        ) : (
-          <div className="flex h-40 items-center justify-center rounded-md border-2 border-dashed bg-muted/50">
-            <p className="text-muted-foreground">No leads captured yet.</p>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+              </TableHeader>
+              <TableBody>
+                {leads.map((lead) => (
+                  <TableRow key={lead.id}>
+                    <TableCell className="font-medium">{lead.name}</TableCell>
+                    <TableCell>{lead.phone}</TableCell>
+                    <TableCell>{formatTimestamp(lead.createdAt)}</TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setLeadToDelete(lead)}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <div className="flex h-40 items-center justify-center rounded-md border-2 border-dashed bg-muted/50">
+              <p className="text-muted-foreground">No leads captured yet.</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </>
   );
 }
