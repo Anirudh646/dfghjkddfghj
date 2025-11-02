@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -13,13 +14,13 @@ import {z} from 'genkit';
 
 const AnswerAdmissionQueryInputSchema = z.object({
   query: z.string().describe('The admission-related query from the student.'),
-  courseDetails: z.string().optional().describe('Course details information, including course-specific fee structures.'),
-  feesInformation: z.string().optional().describe('General fees related information, like hostel and bus fees.'),
-  eligibilityCriteria: z.string().optional().describe('Eligibility criteria information.'),
-  applicationInfo: z.string().optional().describe('Information about the application process, steps, and deadlines.'),
-  scholarshipInfo: z.string().optional().describe('Information about available scholarships.'),
-  facilitiesInformation: z.string().optional().describe('Facilities information.'),
-  contactInformation: z.string().optional().describe('Contact information for help.'),
+  courseDetails: z.string().optional().describe('A comprehensive JSON string containing all information about courses, fees, eligibility, application processes, scholarships, facilities, contacts, and FAQs.'),
+  feesInformation: z.string().optional().describe('Legacy field, data is in courseDetails.'),
+  eligibilityCriteria: z.string().optional().describe('Legacy field, data is in courseDetails.'),
+  applicationInfo: z.string().optional().describe('Legacy field, data is in courseDetails.'),
+  scholarshipInfo: z.string().optional().describe('Legacy field, data is in courseDetails.'),
+  facilitiesInformation: z.string().optional().describe('Legacy field, data is in courseDetails.'),
+  contactInformation: z.string().optional().describe('Legacy field, data is in courseDetails.'),
 });
 export type AnswerAdmissionQueryInput = z.infer<typeof AnswerAdmissionQueryInputSchema>;
 
@@ -58,28 +59,21 @@ const prompt = ai.definePrompt({
   name: 'answerAdmissionQueryPrompt',
   input: {schema: AnswerAdmissionQueryInputSchema},
   output: {schema: AnswerAdmissionQueryOutputSchema},
-  prompt: `You are an AI admission counselor for a university. Your goal is to provide concise, helpful, and accurate information to prospective students based *only* on the context provided.
+  prompt: `You are a highly knowledgeable and friendly AI admission counselor for a university. Your primary role is to provide accurate and helpful information to prospective students based *exclusively* on the comprehensive university data provided below.
 
-  **Contextual Information (Use only this information to answer):**
-  - **Course Details:** {{{courseDetails}}}
-  - **General Fees (Hostel/Bus):** {{{feesInformation}}}
-  - **Eligibility Criteria:** {{{eligibilityCriteria}}}
-  - **Application Process & Deadlines:** {{{applicationInfo}}}
-  - **Scholarships:** {{{scholarshipInfo}}}
-  - **Facilities:** {{{facilitiesInformation}}}
-  - **Contact Information:** {{{contactInformation}}}
+  **University Knowledge Base (Source of Truth):**
+  {{{courseDetails}}}
+  
+  **Student's Query:**
+  "{{{query}}}"
 
-  **Student Query:** {{{query}}}
-
-  **Instructions:**
-  1. Answer the user's query directly and concisely using *only* the information provided in the context above.
-  2. Do not add any information that is not present in the context.
-  3. If the information is not available in the context, state that clearly and suggest contacting the admissions office for more details.
-  4. When providing the fee structure for a course, list it out clearly. If both annual and semester fees are available, provide both.
-  5. If asked about the application process, list the steps clearly.
-  6. If asked about scholarships, summarize the available options.
-  7. Keep your answers short and to the point.
-  8. If asked for a greeting, provide a friendly welcome message and briefly explain your capabilities.
+  **Your Task:**
+  1.  **Analyze the Query:** Carefully understand what the student is asking.
+  2.  **Consult the Knowledge Base:** Find the most relevant information within the provided "University Knowledge Base" to answer the query. You have access to all courses, fees, FAQs, placement data, contacts, and more.
+  3.  **Synthesize a Concise Answer:** Formulate a clear, concise, and friendly answer using *only* the information from the knowledge base.
+  4.  **Be Direct:** Answer the question directly. If asked about fees for a specific course, provide that fee structure. If asked about eligibility, state the requirements clearly.
+  5.  **Handle Missing Information:** If the information needed to answer the query is not in the knowledge base, you MUST state that the information is not available and recommend contacting the university's admission office for the most accurate details. **Do not invent or assume any information.**
+  6.  **Maintain Persona:** Always be helpful, polite, and professional, representing the university in the best possible light.
   `,
 });
 

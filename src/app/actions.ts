@@ -9,80 +9,42 @@ import { z } from 'zod';
 const getContextString = (query: string) => {
   const lowerQuery = query.toLowerCase();
   
-  let courseDetails: string | undefined;
-  const mentionedCourse = courses.find(c => lowerQuery.includes(c.title.toLowerCase()));
-
-  if (mentionedCourse) {
-    const feeInfo = mentionedCourse.feeStructure ? ` Fee Structure: ${JSON.stringify(mentionedCourse.feeStructure)}` : '';
-    const placementInfo = mentionedCourse.placementInfo ? ` Placement Info: ${mentionedCourse.placementInfo}`: '';
-    courseDetails = `${mentionedCourse.title} (${mentionedCourse.department}) - ${mentionedCourse.description}. Duration: ${mentionedCourse.duration}. Eligibility: ${mentionedCourse.eligibility}.${feeInfo}.${placementInfo}`;
-  } else if (/\b(course|program|curriculum|syllabus)\b/.test(lowerQuery)) {
-    courseDetails = `The university offers a variety of undergraduate and professional programs. Key courses include: ${courses.map(c => c.title).join(', ')}. For detailed information, please ask about a specific course.`;
-  }
-
-  let feesInformation: string | undefined;
-  if (/\b(bus)\b/.test(lowerQuery)) {
-    feesInformation = `Bus fees vary by route. Here is the annual fee structure: ${Object.entries(generalInfo.busFees).map(([route, fee]) => `${route}: ₹${fee}`).join(', ')}.`;
-  } else if (/\b(fee|cost|hostel|payment|installment)\b/.test(lowerQuery)) {
-    feesInformation = generalInfo.fees;
-  }
-
-  const eligibilityCriteria = /\b(eligibility|admission requirement)\b/.test(lowerQuery) ? generalInfo.eligibility : undefined;
+  // Provide the full context to the AI for better responses.
+  const courseDetails = `Courses Information: ${JSON.stringify(courses)}`;
+  const feesInformation = `General Fees Information: ${generalInfo.fees}. Bus Fees: ${JSON.stringify(generalInfo.busFees)}`;
+  const eligibilityCriteria = `General Eligibility Criteria: ${generalInfo.eligibility}`;
+  const applicationInfo = `Application Process: ${generalInfo.applicationSteps.join(', ')}. Deadlines: Fall - ${generalInfo.applicationDeadlines.fall}, Spring - ${generalInfo.applicationDeadlines.spring}. Required Documents: ${generalInfo.requiredDocuments.join(', ')}.`;
+  const scholarshipInfo = `The university offers merit-based and need-based scholarships. Students can also apply for various government scholarships. For more details, please check the university's official website or contact the financial aid office.`;
+  const facilitiesInformation = `Campus Facilities: ${generalInfo.facilities}`;
+  const contactInformation = `Contact Information: ${JSON.stringify(contacts)}`;
+  const faqContext = `Frequently Asked Questions: ${JSON.stringify(faqs)}`;
   
-  let applicationInfo: string | undefined;
-  if (/\b(application|apply|admission|deadline|process|procedure)\b/.test(lowerQuery)) {
-    applicationInfo = `Application Steps: ${generalInfo.applicationSteps.join(' ')} Deadlines: Fall - ${generalInfo.applicationDeadlines.fall}, Spring - ${generalInfo.applicationDeadlines.spring}. Required Documents: ${generalInfo.requiredDocuments.join(', ')}.`;
-  }
-
-  const scholarshipInfo = /\b(scholarship|financial aid)\b/.test(lowerQuery) ? `The university offers merit-based and need-based scholarships. Students can also apply for various government scholarships. For more details, please check the university's official website or contact the financial aid office.` : undefined;
-
-  const facilitiesInformation = /\b(facilities|campus|amenities|accommodation|hostel)\b/.test(lowerQuery) ? generalInfo.facilities : undefined;
-  
-  let contactInformation: string | undefined;
-  if (/\b(contact|help)\b/.test(lowerQuery)) {
-      contactInformation = `Key Contacts: ${contacts.map(c => `${c.name} (${c.title}) - ${c.email}`).join('; ')}. For more details, visit the contact page.`;
-  }
-  
-  const faqSummaries = faqs.map(faq => {
-    const questionWords = faq.question.toLowerCase().split(' ');
-    if (questionWords.some(word => lowerQuery.includes(word))) {
-      return faq.answer;
-    }
-    return undefined;
-  }).filter(Boolean).join(' ');
-
-  let entranceExamInfo: string | undefined;
-  if (/\b(exam|test|syllabus|pattern)\b/.test(lowerQuery)) {
-    entranceExamInfo = generalInfo.entranceExams;
-  }
-
-  let applicationStatusInfo: string | undefined;
-  if (/\b(status)\b/.test(lowerQuery)) {
-    applicationStatusInfo = generalInfo.applicationStatus;
-  }
-
-  let internationalInfo: string | undefined;
-  if (/\b(international|foreign|visa)\b/.test(lowerQuery)) {
-    internationalInfo = generalInfo.internationalAdmissions;
-  }
-
-  let placementInfo: string | undefined;
-  if (/\b(placement|job|career|salary|recruiter)\b/.test(lowerQuery)) {
-      placementInfo = generalInfo.placements;
-  }
-
-
-  const combinedContext = [contactInformation, faqSummaries, entranceExamInfo, applicationStatusInfo, internationalInfo, placementInfo].filter(Boolean).join(' ');
-
-
-  return {
+  // Combine all context into a single string for the prompt.
+  const combinedContext = [
     courseDetails,
     feesInformation,
     eligibilityCriteria,
     applicationInfo,
     scholarshipInfo,
     facilitiesInformation,
-    contactInformation: combinedContext,
+    contactInformation,
+    faqContext,
+    `Entrance Exams: ${generalInfo.entranceExams}`,
+    `Application Status Check: ${generalInfo.applicationStatus}`,
+    `International Admissions: ${generalInfo.internationalAdmissions}`,
+    `Placements: ${generalInfo.placements}`,
+  ].join('\n\n');
+
+  return {
+    // Pass the combined context through one of the properties.
+    // The prompt is designed to read from all properties, so we can condense it.
+    courseDetails: combinedContext,
+    feesInformation: undefined,
+    eligibilityCriteria: undefined,
+    applicationInfo: undefined,
+    scholarshipInfo: undefined,
+    facilitiesInformation: undefined,
+    contactInformation: undefined,
   };
 };
 
