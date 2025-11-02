@@ -1,3 +1,4 @@
+
 import type { Course, Contact, FaqItem, GeneralInfo } from '@/lib/types';
 
 export const courses: Course[] = [
@@ -166,7 +167,7 @@ export const courses: Course[] = [
       'Year 2': 500000,
       'Year 3': 500000,
       'Year 4': 500000,
-      'Year 4.5': 250000,
+      'Year 5': 250000,
     },
     placementInfo: '100% internship placement in affiliated hospitals. Graduates join top hospital chains like Apollo and Fortis, with starting salaries ranging from 12-18 LPA.',
   },
