@@ -3,7 +3,7 @@
 
 import React, { useActionState, useEffect, useRef, useState, useTransition } from 'react';
 import { useFormStatus } from 'react-dom';
-import { ArrowUp, Bot, LoaderCircle, Mic, Search } from 'lucide-react';
+import { ArrowUp, Bot, Languages, LoaderCircle, Mic, Search } from 'lucide-react';
 
 import { askAI } from '@/app/actions';
 import { Button } from '@/components/ui/button';
@@ -47,7 +47,9 @@ function InitialOptions({
   transcript,
   isListening,
   startListening,
-  stopListening
+  stopListening,
+  language,
+  setLanguage
 }: { 
   onOptionClick: (option: string) => void; 
   onQuerySubmit: (query: string) => void; 
@@ -55,8 +57,13 @@ function InitialOptions({
   isListening: boolean;
   startListening: () => void;
   stopListening: () => void;
+  language: 'en' | 'hi';
+  setLanguage: (lang: 'en' | 'hi') => void;
 }) {
-  const options = ['Courses', 'Fees', 'FAQ', 'Placement'];
+  const options = language === 'en' 
+    ? ['Courses', 'Fees', 'FAQ', 'Placement']
+    : ['पाठ्यक्रम', 'शुल्क', 'सामान्य प्रश्न', 'प्लेसमेंट'];
+    
   const formRef = useRef<HTMLFormElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -96,9 +103,15 @@ function InitialOptions({
         <Logo className="mb-8 justify-center" />
         <Card className="bg-card/80 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold">Welcome to the AI Admission Counselor</CardTitle>
+            <div className='flex justify-end gap-2 mb-4'>
+                <Button variant={language === 'en' ? 'default' : 'outline'} size='sm' onClick={() => setLanguage('en')}>English</Button>
+                <Button variant={language === 'hi' ? 'default' : 'outline'} size='sm' onClick={() => setLanguage('hi')}>हिन्दी</Button>
+            </div>
+            <CardTitle className="text-2xl font-bold">
+              {language === 'en' ? 'Welcome to the AI Admission Counselor' : 'एआई एडमिशन काउंसलर में आपका स्वागत है'}
+            </CardTitle>
             <CardDescription className="text-lg">
-              How can I help you today? Select an option below or type your question.
+              {language === 'en' ? 'How can I help you today? Select an option below or type your question.' : 'मैं आज आपकी कैसे मदद कर सकता हूँ? नीचे एक विकल्प चुनें या अपना प्रश्न टाइप करें।'}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center gap-4">
@@ -107,7 +120,7 @@ function InitialOptions({
               <Input
                 ref={inputRef}
                 name="query"
-                placeholder={isListening ? "Listening..." : "Ask a question..."}
+                placeholder={isListening ? (language === 'en' ? "Listening..." : "सुन रहा हूँ...") : (language === 'en' ? "Ask a question..." : "एक सवाल पूछें...")}
                 className="w-full rounded-full bg-background/80 pl-10 pr-12 py-3 text-lg"
                 disabled={isListening}
               />
@@ -146,6 +159,7 @@ function InitialOptions({
 export function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [showChat, setShowChat] = useState(false);
+  const [language, setLanguage] = useState<'en' | 'hi'>('en');
   const [aiState, formAction] = useActionState(askAI, initialAIState);
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
@@ -195,6 +209,7 @@ const submitQuery = (query: string) => {
     } else {
       const formData = new FormData();
       formData.append('query', query);
+      formData.append('language', language);
       startTransition(() => {
         formAction(formData);
       });
@@ -216,6 +231,7 @@ const submitQuery = (query: string) => {
     if (pendingQuery) {
       const formData = new FormData();
       formData.append('query', pendingQuery);
+      formData.append('language', language);
       startTransition(() => {
         formAction(formData);
       });
@@ -224,15 +240,20 @@ const submitQuery = (query: string) => {
   };
 
   const handleOptionClick = (option: string) => {
-    if (option === 'FAQ') {
+    const englishOption = ['Courses', 'Fees', 'FAQ', 'Placement'].find(o => o.toLowerCase() === option.toLowerCase());
+    const hindiOption = ['पाठ्यक्रम', 'शुल्क', 'सामान्य प्रश्न', 'प्लेसमेंट'].find(o => o === option);
+    
+    if (option === 'FAQ' || option === 'सामान्य प्रश्न') {
       const faqMessages: Message[] = [
         {
           role: 'assistant',
-          content: "Hello! I'm your AI admission counselor. Here are some frequently asked questions. Feel free to select one or ask your own question.",
+          content: language === 'en' 
+            ? "Hello! I'm your AI admission counselor. Here are some frequently asked questions. Feel free to select one or ask your own question."
+            : "नमस्ते! मैं आपका एआई एडमिशन काउंसलर हूं। यहां कुछ अक्सर पूछे जाने वाले प्रश्न दिए गए हैं। बेझिझک एक चुनें या अपना प्रश्न पूछें।",
         },
         {
           role: 'assistant',
-          content: 'Frequently Asked Questions',
+          content: language === 'en' ? 'Frequently Asked Questions' : 'अक्सर पूछे जाने वाले प्रश्न',
           component: 'FaqSelector',
           componentProps: {
             courses: faqs.map(faq => faq.question),
@@ -244,15 +265,17 @@ const submitQuery = (query: string) => {
       setShowChat(true);
       return;
     }
-     if (option === 'Placement') {
+     if (option === 'Placement' || option === 'प्लेसमेंट') {
         const placementMessages: Message[] = [
         {
           role: 'assistant',
-          content: "I can certainly help with that. Here is a summary of placement records for our popular courses. Select one to learn more.",
+          content: language === 'en' 
+            ? "I can certainly help with that. Here is a summary of placement records for our popular courses. Select one to learn more."
+            : "मैं इसमें निश्चित रूप से मदद कर सकता हूं। हमारे लोकप्रिय पाठ्यक्रमों के प्लेसमेंट रिकॉर्ड کا خلاصہ यहां दिया गया है। अधिक जानने के लिए किसी एक का चयन करें।",
         },
         {
           role: 'assistant',
-          content: 'Placement Records',
+          content: language === 'en' ? 'Placement Records' : 'प्लेसमेंट रिकॉर्ड',
           component: 'PlacementInfoSelector',
           componentProps: {
             courses: courses,
@@ -280,10 +303,12 @@ const submitQuery = (query: string) => {
           ...prev,
           { 
             role: 'assistant', 
-            content: 'I can help with that. Are you interested in course fees, hostel fees, or bus fees?',
+            content: language === 'en'
+              ? 'I can help with that. Are you interested in course fees, hostel fees, or bus fees?'
+              : 'मैं इसमें मदद कर सकता हूँ। क्या आप पाठ्यक्रम शुल्क, छात्रावास शुल्क, या बस शुल्क میں دلچسپی رکھتے ہیں?',
             component: 'FeeTypeSelector',
             componentProps: {
-              courses: ['Course Fees', 'Hostel Fees', 'Bus Fees'],
+              courses: language === 'en' ? ['Course Fees', 'Hostel Fees', 'Bus Fees'] : ['कोर्स शुल्क', 'हॉस्टल शुल्क', 'बस शुल्क'],
               action: (feeType: string) => submitQuery(feeType),
             }
           },
@@ -293,7 +318,7 @@ const submitQuery = (query: string) => {
           ...prev,
           {
             role: 'assistant',
-            content: 'Here are the courses we offer. Select one to learn more.',
+            content: language === 'en' ? 'Here are the courses we offer. Select one to learn more.' : 'यहां ہمارے提供的 पाठ्यक्रम हैं। अधिक जानने के लिए किसी एक का चयन करें।',
             component: 'CourseInfoSelector',
             componentProps: {
               courses: courses,
@@ -307,13 +332,15 @@ const submitQuery = (query: string) => {
           { role: 'assistant', content: aiState.answer as string },
         ];
         
-        if (aiState.answer !== "Hello! I am the university's AI admission counselor. How can I assist you today? You can ask me about courses, fees, eligibility, and more.") {
+        const isGreeting = aiState.answer.includes("AI admission counselor") || aiState.answer.includes("एआई एडमिशन काउंसलर");
+
+        if (!isGreeting) {
            newMessages.push({
             role: 'assistant',
-            content: 'Thank you for your query! What would you like to know next?',
+            content: language === 'en' ? 'Thank you for your query! What would you like to know next?' : 'आपके प्रश्न के लिए धन्यवाद! आप आगे क्या जानना चाहेंगे?',
             component: 'FeeTypeSelector', // Re-using for general options
             componentProps: {
-              courses: ['Courses', 'Fees', 'FAQ', 'Placement'],
+              courses: language === 'en' ? ['Courses', 'Fees', 'FAQ', 'Placement'] : ['पाठ्यक्रम', 'शुल्क', 'सामान्य प्रश्न', 'प्लेसमेंट'],
               action: (option: string) => submitQuery(option),
             },
           });
@@ -332,7 +359,7 @@ const submitQuery = (query: string) => {
         description: aiState.error,
       });
     }
-  }, [aiState, toast]);
+  }, [aiState, toast, language]);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -348,7 +375,9 @@ const submitQuery = (query: string) => {
   const startChat = (initialQuery?: string) => {
     const greetingMessage = {
       role: 'assistant',
-      content: "Hello! I am the university's AI admission counselor. How can I assist you today? You can ask me about courses, fees, eligibility, and more."
+      content: language === 'en' 
+        ? "Hello! I am the university's AI admission counselor. How can I assist you today? You can ask me about courses, fees, eligibility, and more."
+        : "नमस्ते! मैं विश्वविद्यालय का एआई एडमिशन काउंसलर हूं। मैं आज आपकी کیسے مدد کر सकता हूँ? आप मुझसे पाठ्यक्रम, शुल्क, पात्रता आदि के बारे में पूछ सकते हैं।"
     } as Message;
     
     let initialMessages = [greetingMessage];
@@ -369,6 +398,8 @@ const submitQuery = (query: string) => {
       isListening={isListening}
       startListening={startListening}
       stopListening={stopListening}
+      language={language}
+      setLanguage={setLanguage}
       />;
   }
 
@@ -426,7 +457,7 @@ const submitQuery = (query: string) => {
           <Input
             ref={inputRef}
             name="query"
-            placeholder={isListening ? "Listening..." : "Ask about courses, fees, eligibility..."}
+            placeholder={isListening ? (language === 'en' ? "Listening..." : "सुन रहा हूँ...") : (language === 'en' ? "Ask about courses, fees, eligibility..." : "पाठ्यक्रम, शुल्क, पात्रता के बारे में पूछें...")}
             autoComplete="off"
             className="flex-1"
             required
@@ -456,3 +487,5 @@ const submitQuery = (query: string) => {
     </div>
   );
 }
+
+    

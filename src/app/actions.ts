@@ -48,22 +48,28 @@ const getContextString = (query: string) => {
   };
 };
 
-const AskAISchema = z.string().min(1, { message: 'Query cannot be empty.' }).max(500, { message: 'Query is too long.' });
+const AskAISchema = z.object({
+  query: z.string().min(1, { message: 'Query cannot be empty.' }).max(500, { message: 'Query is too long.' }),
+  language: z.enum(['en', 'hi']),
+});
 
 export async function askAI(prevState: any, formData: FormData): Promise<{ answer?: string; error?: string }> {
-  const query = formData.get('query');
-  const validation = AskAISchema.safeParse(query);
+  const validation = AskAISchema.safeParse({
+    query: formData.get('query'),
+    language: formData.get('language'),
+  });
 
   if (!validation.success) {
     return { error: validation.error.errors[0].message };
   }
 
-  const validQuery = validation.data;
+  const { query, language } = validation.data;
 
   try {
-    const context = getContextString(validQuery);
+    const context = getContextString(query);
     const result = await answerAdmissionQuery({
-      query: validQuery,
+      query: query,
+      language: language,
       ...context,
     });
     return { answer: result.answer };
@@ -100,3 +106,5 @@ export async function getStarted(prevState: any, formData: FormData): Promise<{ 
     return { error: 'An error occurred while generating your guide. Please try again.' };
   }
 }
+
+    
