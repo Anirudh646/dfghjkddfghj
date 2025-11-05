@@ -32,126 +32,10 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, Trash2, UserCheck } from 'lucide-react';
+import { AlertCircle, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import type { Lead } from '@/lib/types';
-import { useUser, useAuth } from '@/firebase/provider';
 import { Button, buttonVariants } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
-
-const formSchema = z.object({
-  email: z.string().email({ message: 'Please enter a valid email.' }),
-  password: z
-    .string()
-    .min(6, { message: 'Password must be at least 6 characters.' }),
-});
-
-function SignInForm() {
-  const auth = useAuth();
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: { email: '', password: '' },
-  });
-
-  async function onSignIn(values: z.infer<typeof formSchema>) {
-    try {
-      await signInWithEmailAndPassword(auth, values.email, values.password);
-    } catch (error: any) {
-      if (error.code === 'auth/invalid-credential') {
-        form.setError('password', {
-          type: 'manual',
-          message: 'Incorrect email or password.',
-        });
-      } else {
-        form.setError('root.serverError', {
-          type: 'manual',
-          message: 'An unexpected error occurred. Please try again.',
-        });
-      }
-    }
-  }
-
-  return (
-    <div className="flex h-full min-h-[500px] items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/50 p-8 text-center">
-      <div className="w-full max-w-sm">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
-          <UserCheck className="h-8 w-8" />
-        </div>
-        <h2 className="mt-4 text-xl font-semibold tracking-tight">
-          Secure Access Required
-        </h2>
-        <p className="mt-2 text-muted-foreground">
-          Please sign in to view leads.
-        </p>
-
-        <Card className="mt-6 text-left">
-          <CardHeader>
-            <CardTitle>Sign In</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSignIn)}
-                className="space-y-4"
-              >
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input placeholder="admin@example.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="••••••••"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                {form.formState.errors.root?.serverError && (
-                  <FormMessage className="text-destructive">
-                    {form.formState.errors.root.serverError.message}
-                  </FormMessage>
-                )}
-                <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-                  {form.formState.isSubmitting ? 'Signing In...' : 'Sign In'}
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-}
 
 function formatTimestamp(timestamp: { seconds: number; nanoseconds: number }) {
   if (!timestamp || typeof timestamp.seconds !== 'number') {
@@ -198,35 +82,23 @@ function LeadsSkeleton() {
 
 export default function LeadsPage() {
   const firestore = useFirestore();
-  const auth = useAuth();
-  const { user, isUserLoading, userError } = useUser();
   const [leadToDelete, setLeadToDelete] = useState<Lead | null>(null);
   const [selectedLeads, setSelectedLeads] = useState<string[]>([]);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
-
   const leadsQuery = useMemoFirebase(
     () =>
-      user
+      firestore
         ? query(collection(firestore, 'leads'), orderBy('createdAt', 'desc'))
         : null,
-    [firestore, user]
+    [firestore]
   );
 
   const {
     data: leads,
-    isLoading: isLeadsLoading,
-    error: leadsError,
+    isLoading,
+    error,
   } = useCollection<Lead>(leadsQuery);
-
-  const isLoading = isUserLoading || (user && isLeadsLoading);
-
-  useEffect(() => {
-    // When the user logs out, clear the selected leads
-    if (!user) {
-      setSelectedLeads([]);
-    }
-  }, [user]);
 
   useEffect(() => {
     // When the leads data changes (e.g., after deletion), clear selections
@@ -278,29 +150,6 @@ export default function LeadsPage() {
   const numSelected = selectedLeads.length;
   const rowCount = leads?.length ?? 0;
 
-
-  if (isUserLoading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Leads</CardTitle>
-          <CardDescription>
-            Contact information captured from the AI Counselor.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <LeadsSkeleton />
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (!user) {
-    return <SignInForm />;
-  }
-
-  const error = userError || leadsError;
-
   return (
     <>
       <AlertDialog
@@ -339,9 +188,6 @@ export default function LeadsPage() {
                   Delete ({numSelected})
                 </Button>
               )}
-              <Button variant="outline" onClick={() => signOut(auth)}>
-                Sign Out
-              </Button>
             </div>
           </div>
         </CardHeader>
@@ -414,5 +260,3 @@ export default function LeadsPage() {
     </>
   );
 }
-
-    

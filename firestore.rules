@@ -28,13 +28,13 @@ service cloud.firestore {
      * @description Secures the leads collection.
      * @path /leads/{leadId}
      * @allow (create) for any user to capture leads.
-     * @allow (list, get) for authenticated users to view leads.
+     * @allow (list, get) for any user.
      * @allow (delete) for authenticated users.
      * @deny (update) to protect lead information.
      */
     match /leads/{leadId} {
       allow create: if true;
-      allow list, get: if isSignedIn();
+      allow list, get: if true;
       allow delete: if isSignedIn();
       allow update: if false;
     }
