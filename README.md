@@ -87,3 +87,5 @@ To deploy to other platforms, you can generally follow these steps:
 3.  Set up environment variables (like `GEMINI_API_KEY`) in the provider's dashboard.
 
 The application will be built and deployed automatically on `git push`.
+
+# ai-admission
