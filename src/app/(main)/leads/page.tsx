@@ -1,8 +1,8 @@
 
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
-import { collection, query, orderBy, doc, deleteDoc, writeBatch } from 'firebase/firestore';
+import { useState, useEffect } from 'react';
+import { collection, query, orderBy, doc, writeBatch } from 'firebase/firestore';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import {
   AlertDialog,
@@ -101,7 +101,6 @@ export default function LeadsPage() {
   } = useCollection<Lead>(leadsQuery);
 
   useEffect(() => {
-    // When the leads data changes (e.g., after deletion), clear selections
     setSelectedLeads([]);
   }, [leads]);
 
